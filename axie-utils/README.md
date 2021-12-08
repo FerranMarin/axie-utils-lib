@@ -1,21 +1,47 @@
 # Axie Utils Library
-I created [Axie Scholar Utilities](https://github.com/FerranMarin/axie-scholar-utilities/edit/main/README.md) a CLI tool that automates various activities related to manage Axie Infinity Scholarships.
 
-This library is born from the need to re-use some of my code for other projects, something like a GUI or a discord bot. This will enable such things. It is also a good point for other developers to also use what I've already built and use it as a base.
+Aim of this library is to contain all the actions one might want to do when building tools around the Axie Infinity videogame. It started with me building an automation tool and needing to build different solutions. Extracting this functionality allows for that easily.
 
-This library has then NO monetization so it is free to use, of course, but I would appreciate any donnations to incentivize me to mantain it!
 
-# Donations
+# Installation
 
-If you want to donate to thank me, feel free to do so at this ronin address:
+Install and update using pip:
 
-    ronin:9fa1bc784c665e683597d3f29375e45786617550
+```
+pip install -U axie-utils
+```
 
-If you prefer you can:
+# Simple Example
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G36LZ2A)
-    
-# Discord
+This example would send 100 SLP from `ronin:from_where_to_send_SLP` to `ronin:to_where_we_send_SLP`.
 
-Feel free to join this <a href="https://discord.gg/bmKvmhenvu">Discord</a> that started with the axie scholar utilities CLI tool. I am very active there.
-Alternatively see other ways to contact me on my github profile.
+``` python
+from axie-utils import Payment
+
+p = Payment(
+    "Testing Account",
+    "ronin:from_where_to_send_SLP",
+    "0x:private_key_from_the_from_acc",
+    "ronin:to_where_we_send_SLP",
+    100)
+
+p.execute()
+```
+
+This example, shows how we would claim SLP from an account.
+
+``` python
+from axie-utils import Claim
+
+c = Claim(
+    "Testing Account",
+    "ronin:acc_to_claim",
+    "0x:private_key_from_acc_to_claim"
+)
+c.execute()
+
+```
+
+# Documentation
+
+For furhter documentation, please visit this [link]().
