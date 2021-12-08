@@ -7,6 +7,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./axie-utils
 
     steps:
       - uses: actions/checkout@v2
@@ -26,15 +29,13 @@ jobs:
         id: cached-poetry-dependencies
         uses: actions/cache@v2
         with:
-          path: ./axie-utils/venv
+          path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       # install dependencies if cache does not exist 
       - name: Install dependencies
-        working-directory: ./axie-utils
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
       - name: Test with pytest
-        working-directory: ./axie-utils
         run: poetry run pytest --cov . -n 2
