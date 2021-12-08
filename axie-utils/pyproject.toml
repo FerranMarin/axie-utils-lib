@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "axie-utils"
+version = "0.1.0"
+description = "Library that provides the functionality you need to build your own axie Infinity python tools"
+authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
+license = "GNU LGPLv3"
+readme = "README.md"
+homepage = "https://github.com/johnfraney/flake8-markdown"
+repository = "https://github.com/johnfraney/flake8-markdown"
+keywords = ["axie", "axie infinity", "tools", "utils", "ronin", "ronin chain"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Topic :: Games/Entertainment",
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)"
+]
+include = [
+    "LICENSE",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
