@@ -24,7 +24,7 @@ class Claim(AxieGraphQL):
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
-        with open("axie/slp_abi.json", encoding='utf-8') as f:
+        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
@@ -125,7 +125,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
-        with open("axie/slp_abi.json", encoding='utf-8') as f:
+        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
