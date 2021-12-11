@@ -1,5 +1,5 @@
 import builtins
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from mock import patch, call, mock_open
 from freezegun import freeze_time
