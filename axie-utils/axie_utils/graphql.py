@@ -9,7 +9,7 @@ from hexbytes import HexBytes
 from trezorlib import ethereum
 from trezorlib.tools import parse_path
 
-from utils import USER_AGENT, RETRIES
+from axie_utils.utils import USER_AGENT, RETRIES
 
 
 class AxieGraphQL:

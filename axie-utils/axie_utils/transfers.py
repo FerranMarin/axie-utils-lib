@@ -8,7 +8,7 @@ from trezorlib.tools import parse_path
 from trezorlib import ethereum
 from web3 import Web3, exceptions
 
-from utils import (
+from axie_utils.utils import (
     get_nonce,
     RONIN_PROVIDER_FREE,
     AXIE_CONTRACT,

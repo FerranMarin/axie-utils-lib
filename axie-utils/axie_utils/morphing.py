@@ -6,7 +6,7 @@ from trezorlib import ethereum
 from requests.exceptions import RetryError
 from web3 import Web3
 
-from graphql import AxieGraphQL, TrezorAxieGraphQL
+from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 
 
 class Morph(AxieGraphQL):

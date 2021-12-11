@@ -8,13 +8,13 @@ from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 from trezorlib import ethereum
 
-from utils import (
+from axie_utils.utils import (
     check_balance,
     get_nonce,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE
 )
-from graphql import AxieGraphQL, TrezorAxieGraphQL
+from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 
 
 class Claim(AxieGraphQL):
