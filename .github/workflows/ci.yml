@@ -38,4 +38,4 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
       - name: Test with pytest
-        run: poetry run pytest --cov . -n 2
+        run: poetry run pytest --cov
