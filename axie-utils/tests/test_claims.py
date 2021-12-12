@@ -1,5 +1,4 @@
 import builtins
-from glob import glob
 from datetime import datetime, timedelta
 
 import pytest
