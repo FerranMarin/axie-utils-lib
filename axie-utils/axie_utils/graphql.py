@@ -13,7 +13,6 @@ from axie_utils.utils import USER_AGENT, RETRIES
 
 
 class AxieGraphQL:
-
     def __init__(self, account, private_key, **kwargs):
         self.account = account.lower().replace("ronin:", "0x")
         self.private_key = private_key.lower()
@@ -77,7 +76,6 @@ class AxieGraphQL:
 
 
 class TrezorAxieGraphQL:
-
     def __init__(self, account, client, bip_path):
         self.account = account.lower().replace("ronin:", "0x")
         self.request = requests.Session()

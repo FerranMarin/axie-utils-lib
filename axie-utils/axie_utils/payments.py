@@ -18,7 +18,6 @@ from axie_utils.utils import (
 
 
 class Payment:
-
     def __init__(self, name, from_acc, from_private, to_acc, amount):
         self.w3 = Web3(
             Web3.HTTPProvider(
@@ -29,7 +28,7 @@ class Payment:
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
-        with open("axie/slp_abi.json", encoding='utf-8') as f:
+        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
             slb_abi = json.load(f)
         self.contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
@@ -141,7 +140,6 @@ class Payment:
 
 
 class TrezorPayment:
-
     def __init__(self, name, client, bip_path, from_acc, to_acc, amount):
         self.w3 = Web3(
             Web3.HTTPProvider(

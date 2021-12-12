@@ -10,7 +10,6 @@ from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 
 
 class Morph(AxieGraphQL):
-
     def __init__(self, axie, **kwargs):
         self.axie = axie
         super().__init__(**kwargs)
@@ -55,7 +54,6 @@ class Morph(AxieGraphQL):
 
 
 class TrezorMorph(TrezorAxieGraphQL):
-
     def __init__(self, axie, **kwargs):
         self.axie = axie
         super().__init__(**kwargs)

@@ -106,7 +106,7 @@ class TrezorTransfer:
 
     def execute(self):
         # Load ABI
-        with open('trezor/axie_abi.json', encoding='utf-8') as f:
+        with open('axie_utils/axie_abi.json', encoding='utf-8') as f:
             axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
