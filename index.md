@@ -87,11 +87,11 @@ g.create_random_msg()
 
 # Utils
 
-slp_balance = get_balance("ronin:to_check_the_balance")
-slp_balance = get_balance("ronin:to_check_the_balance", 'slp')
-axs_balance = get_balance("ronin:to_check_the_balance", 'axs')
-axies_balance = get_balance("ronin:to_check_the_balance", 'axies')
-weth_balance = get_balance("ronin:to_check_the_balance", 'weth')
+slp_balance = check_balance("ronin:to_check_the_balance")
+slp_balance = check_balance("ronin:to_check_the_balance", 'slp')
+axs_balance = check_balance("ronin:to_check_the_balance", 'axs')
+axies_balance = check_balance("ronin:to_check_the_balance", 'axies')
+weth_balance = check_balance("ronin:to_check_the_balance", 'weth')
 
 nonce = get_nonce("ronin:to_check_its_nonce")
 ```
