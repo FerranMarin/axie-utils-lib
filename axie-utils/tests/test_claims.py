@@ -8,6 +8,7 @@ from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie_utils import Claim, TrezorClaim
+from axie_utils.abis import SLP_ABI
 from axie_utils.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
 from tests.test_utils import MockedSignedMsg
 
@@ -16,16 +17,13 @@ from tests.test_utils import MockedSignedMsg
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        c = Claim(account="ronin:foo", private_key="bar", acc_name="test_acc")
+    c = Claim(account="ronin:foo", private_key="bar", acc_name="test_acc")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     assert c.private_key == "bar"
     assert c.account == "0xfoo"
     assert c.acc_name == "test_acc"
@@ -41,18 +39,15 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
                        json={"total": 12,
                              "last_claimed_item_at": round(last_claimed_date.timestamp()),
                              "claimable_total": 0})
-        with patch.object(builtins,
-                          "open",
-                          mock_open(read_data='{"foo": "bar"}')):
-            c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
-            unclaimed = c.has_unclaimed_slp()
-            assert unclaimed == 12
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
+        unclaimed = c.has_unclaimed_slp()
+        assert unclaimed == 12
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
 
 
 @patch("web3.eth.Eth.contract")
@@ -62,18 +57,15 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        status_code=500)
-        with patch.object(builtins,
-                          "open",
-                          mock_open(read_data='{"foo": "bar"}')):
-            c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
-            unclaimed = c.has_unclaimed_slp()
-            assert unclaimed is None
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
+        unclaimed = c.has_unclaimed_slp()
+        assert unclaimed is None
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
 
 
 def test_create_random_msg():
@@ -261,30 +253,27 @@ async def test_claim_execution(mocked_provider,
                                mock_receipt,
                                mock_keccak,
                                mock_to_hex):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        with requests_mock.Mocker() as req_mocker:
-            req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
-                json={
-                    "blockchain_related": {
-                        "signature": {
-                            "amount": "456",
-                            "timestamp": str(int(datetime.now().timestamp())),
-                            "signature": "0xsignature"
-                        }
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post(
+            "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+            json={
+                "blockchain_related": {
+                    "signature": {
+                        "amount": "456",
+                        "timestamp": str(int(datetime.now().timestamp())),
+                        "signature": "0xsignature"
                     }
                 }
-            )
-            c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
-            await c.execute()
+            }
+        )
+        c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
+        await c.execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     moocked_check_balance.assert_called_with("0xfoo")
     mocked_unclaimed_slp.assert_called_once()
     assert c.private_key == "0x00003A01C01173D676B64123".lower()
@@ -323,41 +312,38 @@ async def test_execution_failed_get_blockchain(mocked_provider,
                                                mock_receipt,
                                                mock_keccak,
                                                mock_to_hex):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        with requests_mock.Mocker() as req_mocker:
-            req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
-                json={
-                    "blockchain_related": {
-                        "signature": {
-                            "amount": "",
-                            "timestamp": 0,
-                            "signature": ""
-                        }
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post(
+            "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+            json={
+                "blockchain_related": {
+                    "signature": {
+                        "amount": "",
+                        "timestamp": 0,
+                        "signature": ""
                     }
                 }
-            )
-            c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
-            await c.execute()
-        mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
-            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+            }
         )
-        mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-        moocked_check_balance.assert_not_called()
-        mocked_unclaimed_slp.assert_called_once()
-        assert c.private_key == "0x00003A01C01173D676B64123".lower()
-        assert c.account == "0xfoo"
-        mock_get_jwt.assert_called_once()
-        mock_get_nonce.assert_not_called()
-        mocked_sign_transaction.assert_not_called()
-        mock_raw_send.assert_not_called()
-        mock_receipt.assert_not_called()
-        mock_keccak.assert_not_called()
-        mock_to_hex.assert_not_called()
+        c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
+        await c.execute()
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER_FREE,
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+    )
+    mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
+    moocked_check_balance.assert_not_called()
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.private_key == "0x00003A01C01173D676B64123".lower()
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_not_called()
+    mocked_sign_transaction.assert_not_called()
+    mock_raw_send.assert_not_called()
+    mock_receipt.assert_not_called()
+    mock_keccak.assert_not_called()
+    mock_to_hex.assert_not_called()
 
 
 @patch("axie_utils.graphql.parse_path", return_value="parsed_path")
@@ -367,14 +353,14 @@ async def test_execution_failed_get_blockchain(mocked_provider,
 def test_trezor_claim_init(mocked_provider, mocked_checksum, mocked_contract, mocked_parse):
     with patch.object(builtins,
                       "open",
-                      mock_open(read_data='{"foo": "bar"}')):
+                      mock_open(read_data='SLP_ABI')):
         c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
     assert c.bip_path == "parsed_path"
     assert c.client == "client"
@@ -395,7 +381,7 @@ def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contr
                              "claimable_total": 0})
         with patch.object(builtins,
                           "open",
-                          mock_open(read_data='{"foo": "bar"}')):
+                          mock_open(read_data='SLP_ABI')):
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 12
@@ -405,7 +391,7 @@ def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contr
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
 
 
 @patch("axie_utils.graphql.parse_path", return_value="parsed_path")
@@ -418,7 +404,7 @@ def test_has_unclaimed_slp_failed_req_trezor(mocked_provider, mocked_checksum, m
                        status_code=500)
         with patch.object(builtins,
                           "open",
-                          mock_open(read_data='{"foo": "bar"}')):
+                          mock_open(read_data='SLP_ABI')):
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed is None
@@ -428,7 +414,7 @@ def test_has_unclaimed_slp_failed_req_trezor(mocked_provider, mocked_checksum, m
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
 
 
 @patch("axie_utils.graphql.parse_path", return_value="parsed_path")
@@ -655,7 +641,7 @@ async def test_claim_execution_trezor(mocked_provider,
                                       mocked_parse):
     with patch.object(builtins,
                       "open",
-                      mock_open(read_data='{"foo": "bar"}')):
+                      mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
                 "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
@@ -678,7 +664,7 @@ async def test_claim_execution_trezor(mocked_provider,
     mocked_to_bytes.assert_called()
     mock_rlp.assert_called()
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     moocked_check_balance.assert_called_with("0xfoo")
     mocked_unclaimed_slp.assert_called_once()
     mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
@@ -727,7 +713,7 @@ async def test_execution_failed_get_blockchain_trezor(mocked_provider,
                                                       mocked_parse):
     with patch.object(builtins,
                       "open",
-                      mock_open(read_data='{"foo": "bar"}')):
+                      mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
                 "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
@@ -748,7 +734,7 @@ async def test_execution_failed_get_blockchain_trezor(mocked_provider,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
         moocked_check_balance.assert_not_called()
         mocked_unclaimed_slp.assert_called_once()
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")

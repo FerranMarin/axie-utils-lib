@@ -1,7 +1,6 @@
-import builtins
+from mock import patch, call
 
-from mock import patch, call, mock_open
-
+from axie_utils.abis import AXIE_ABI
 from axie_utils.transfers import Transfer, TrezorTransfer
 from axie_utils.utils import AXIE_CONTRACT
 
@@ -28,12 +27,8 @@ def test_execute_transfer(mock_transaction_receipt,
         "ronin:to_ronin",
         123
     )
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        t.execute()
-    mock_file.assert_called_with("axie_utils/axie_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address='checksum', abi={'foo': 'bar'})
+    t.execute()
+    mock_contract.assert_called_with(address='checksum', abi=AXIE_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()
@@ -76,12 +71,8 @@ def test_execute_transfer_trezor(mock_transaction_receipt,
         from_acc="ronin:from_ronin",
         axie_id=123
     )
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        t.execute()
-    mock_file.assert_called_with("axie_utils/axie_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address='checksum', abi={'foo': 'bar'})
+    t.execute()
+    mock_contract.assert_called_with(address='checksum', abi=AXIE_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()

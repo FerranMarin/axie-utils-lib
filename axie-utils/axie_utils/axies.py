@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from web3 import Web3
 import requests
 
+from axie_utils.abis import AXIE_ABI
 from axie_utils.utils import check_balance, RONIN_PROVIDER, AXIE_CONTRACT, USER_AGENT
 
 
@@ -15,11 +16,9 @@ class Axies:
                 RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.acc = account.replace("ronin:", "0x")
-        with open("axie_utils/axie_abi.json") as f:
-            axie_abi = json.load(f)
         self.contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
-            abi=axie_abi
+            abi=AXIE_ABI
         )
         self.now = datetime.now()
 

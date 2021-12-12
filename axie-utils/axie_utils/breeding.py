@@ -8,6 +8,7 @@ from web3 import Web3, exceptions
 from trezorlib.tools import parse_path
 from trezorlib import ethereum
 
+from axie_utils.abis import AXIE_ABI
 from axie_utils.utils import (
     get_nonce,
     RONIN_PROVIDER_FREE,
@@ -30,11 +31,9 @@ class Breed:
 
     def execute(self):
         # Prepare transaction
-        with open("axie_utils/axie_abi.json") as f:
-            axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
-            abi=axie_abi
+            abi=AXIE_ABI
         )
         # Get Nonce
         nonce = get_nonce(self.address)
@@ -104,11 +103,9 @@ class TrezorBreed:
 
     def execute(self):
         # Prepare transaction
-        with open("axie/axie_abi.json") as f:
-            axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
-            abi=axie_abi
+            abi=AXIE_ABI
         )
         # Get Nonce
         nonce = get_nonce(self.address)

@@ -2,6 +2,8 @@ from requests.packages.urllib3.util.retry import Retry
 from web3 import Web3
 from trezorlib.ui import ClickUI
 
+from axie_utils.abis import BALANCE_ABI
+
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36" # noqa
 TIMEOUT_MINS = 5
 AXIE_CONTRACT = "0x32950db2a7164ae833121501c797d79e7b79d74c"
@@ -16,29 +18,6 @@ RETRIES = Retry(
     status_forcelist=[500, 502, 503, 504],
     allowed_methods=frozenset(['GET', 'POST'])
 )
-BALANCE_ABI = [
-    {
-      "constant": True,
-      "inputs": [
-          {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-          }
-      ],
-      "name": "balanceOf",
-      "outputs": [
-          {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-          }
-      ],
-      "payable": False,
-      "stateMutability": "view",
-      "type": "function"
-    }
-]
 
 
 def check_balance(account, token='slp'):

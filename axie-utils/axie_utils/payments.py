@@ -8,6 +8,7 @@ from trezorlib import ethereum
 from trezorlib.tools import parse_path
 from web3 import Web3, exceptions
 
+from axie_utils.abis import SLP_ABI
 from axie_utils.utils import (
     get_nonce,
     SLP_CONTRACT,
@@ -28,11 +29,9 @@ class Payment:
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
-        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
-            slb_abi = json.load(f)
         self.contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=slb_abi
+            abi=SLP_ABI
         )
 
     def send_replacement_tx(self, nonce):
@@ -149,11 +148,9 @@ class TrezorPayment:
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
-        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
-            slb_abi = json.load(f)
         self.contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=slb_abi
+            abi=SLP_ABI
         )
         self.client = client
         self.bip_path = parse_path(bip_path)

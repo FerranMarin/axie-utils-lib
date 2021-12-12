@@ -8,6 +8,7 @@ from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 from trezorlib import ethereum
 
+from axie_utils.abis import SLP_ABI
 from axie_utils.utils import (
     check_balance,
     get_nonce,
@@ -24,11 +25,9 @@ class Claim(AxieGraphQL):
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
-        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
-            slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=slp_abi
+            abi=SLP_ABI
         )
         self.acc_name = acc_name
         self.request = requests.Session()
@@ -125,11 +124,9 @@ class TrezorClaim(TrezorAxieGraphQL):
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
-        with open("axie_utils/slp_abi.json", encoding='utf-8') as f:
-            slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=slp_abi
+            abi=SLP_ABI
         )
         self.acc_name = acc_name
         self.request = requests.Session()

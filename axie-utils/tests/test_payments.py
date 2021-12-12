@@ -3,22 +3,19 @@ import builtins
 from mock import patch, call, mock_open
 
 from axie_utils import Payment, TrezorPayment
+from axie_utils.abis import SLP_ABI
 from axie_utils.utils import SLP_CONTRACT
 
 
 @patch("web3.eth.Eth.contract", return_value="contract")
 @patch("web3.Web3.toChecksumAddress")
 def test_payment_get_nonce_calls_w3_low_nonce(mocked_checksum, mock_contract):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10)
-    mock_file.assert_called_with("axie_utils/slp_abi.json", encoding='utf-8')
+    p = Payment(
+        "random_account",
+        "ronin:from_ronin",
+        "ronin:from_private_ronin",
+        "ronin:to_ronin",
+        10)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mock_contract.assert_called()
     assert p.contract == "contract"
@@ -45,18 +42,14 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                       mock_sign,
                                       mock_checksum,
                                       _):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10)
-        p.execute()
-    mock_file.assert_called_with("axie_utils/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    p = Payment(
+        "random_account",
+        "ronin:from_ronin",
+        "ronin:from_private_ronin",
+        "ronin:to_ronin",
+        10)
+    p.execute()
+    mock_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()
@@ -87,18 +80,14 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             mock_checksum,
                                             mock_replacement_tx,
                                             _):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10)
-        p.execute()
-    mock_file.assert_called_with("axie_utils/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    p = Payment(
+        "random_account",
+        "ronin:from_ronin",
+        "ronin:from_private_ronin",
+        "ronin:to_ronin",
+        10)
+    p.execute()
+    mock_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()
@@ -132,19 +121,15 @@ def test_execute_calls_web3_functions_trezor(mock_transaction_receipt,
                                              _,
                                              mocked_to_bytes,
                                              mock_rlp):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = TrezorPayment(
-            "random_account",
-            "client",
-            "m/44'/60'/0'/0/0",
-            "ronin:from_ronin",
-            "ronin:to_ronin",
-            10)
-        p.execute()
-    mock_file.assert_called_with("axie_utils/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    p = TrezorPayment(
+        "random_account",
+        "client",
+        "m/44'/60'/0'/0/0",
+        "ronin:from_ronin",
+        "ronin:to_ronin",
+        10)
+    p.execute()
+    mock_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()
@@ -180,19 +165,15 @@ def test_execute_calls_web3_functions_retry_trezor(mock_replacement_tx,
                                                    _,
                                                    mocked_to_bytes,
                                                    mock_rlp):
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = TrezorPayment(
-            "random_account",
-            "client",
-            "m/44'/60'/0'/0/0",
-            "ronin:from_ronin",
-            "ronin:to_ronin",
-            10)
-        p.execute()
-    mock_file.assert_called_with("axie_utils/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    p = TrezorPayment(
+        "random_account",
+        "client",
+        "m/44'/60'/0'/0/0",
+        "ronin:from_ronin",
+        "ronin:to_ronin",
+        10)
+    p.execute()
+    mock_contract.assert_called_with(address="checksum", abi=SLP_ABI)
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_send.assert_called_once()

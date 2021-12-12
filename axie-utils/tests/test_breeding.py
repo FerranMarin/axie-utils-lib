@@ -3,6 +3,7 @@ import builtins
 from mock import patch, mock_open
 
 from axie_utils import Breed, TrezorBreed
+from axie_utils.abis import AXIE_ABI
 from axie_utils.utils import AXIE_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
 
 
@@ -36,18 +37,15 @@ def test_breed_execute(mocked_provider,
                        mock_to_hex):
     acc = 'ronin:<accountfoo_address>' + "".join([str(x) for x in range(10)]*4)
     private_acc = '0x<accountfoo_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        b = Breed(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
-        b.execute()
+    b = Breed(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
+    b.execute()
     mock_get_nonce.assert_called_once()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=AXIE_ABI)
     mocked_sign_transaction.assert_called_once()
     mock_raw_send.assert_called_once()
     mock_keccak.assert_called_once()
@@ -89,11 +87,8 @@ def test_trezorbreed_execute(mocked_provider,
                              mocked_to_bytes,
                              mock_rlp):
     acc = 'ronin:<accountfoo_address>' + "".join([str(x) for x in range(10)]*4)
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        b = TrezorBreed(sire_axie=123, matron_axie=456, address=acc, client='client', bip_path="m/44'/60'/0'/0/0")
-        b.execute()
+    b = TrezorBreed(sire_axie=123, matron_axie=456, address=acc, client='client', bip_path="m/44'/60'/0'/0/0")
+    b.execute()
     mocked_to_bytes.assert_called()
     mock_rlp.assert_called()
     mock_get_nonce.assert_called_once()
@@ -102,7 +97,7 @@ def test_trezorbreed_execute(mocked_provider,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_contract.assert_called_with(address="checksum", abi=AXIE_ABI)
     mocked_sign_transaction.assert_called_once()
     mock_raw_send.assert_called_once()
     mock_keccak.assert_called_once()
