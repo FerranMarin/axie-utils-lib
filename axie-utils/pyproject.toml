@@ -5,8 +5,8 @@ description = "Library that provides the functionality you need to build your ow
 authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
 license = "GNU LGPLv3"
 readme = "README.md"
-homepage = "https://github.com/johnfraney/flake8-markdown"
-repository = "https://github.com/johnfraney/flake8-markdown"
+homepage = "https://ferranmarin.github.io/axie-utils-lib/"
+repository = "https://github.com/FerranMarin/axie-utils-lib"
 keywords = ["axie", "axie infinity", "tools", "utils", "ronin", "ronin chain"]
 classifiers = [
     "Environment :: Console",
