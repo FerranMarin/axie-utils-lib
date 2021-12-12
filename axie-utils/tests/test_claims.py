@@ -241,18 +241,18 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_claim_execution(mocked_provider,
-                               mocked_checksum,
-                               mocked_contract,
-                               moocked_check_balance,
-                               mocked_unclaimed_slp,
-                               mock_get_jwt,
-                               mock_get_nonce,
-                               mocked_sign_transaction,
-                               mock_raw_send,
-                               mock_receipt,
-                               mock_keccak,
-                               mock_to_hex):
+async def test_claim_async_execute(mocked_provider,
+                                   mocked_checksum,
+                                   mocked_contract,
+                                   moocked_check_balance,
+                                   mocked_unclaimed_slp,
+                                   mock_get_jwt,
+                                   mock_get_nonce,
+                                   mocked_sign_transaction,
+                                   mock_raw_send,
+                                   mock_receipt,
+                                   mock_keccak,
+                                   mock_to_hex):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post(
             "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
@@ -267,7 +267,7 @@ async def test_claim_execution(mocked_provider,
             }
         )
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
-        await c.execute()
+        await c.async_execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
@@ -300,18 +300,18 @@ async def test_claim_execution(mocked_provider,
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_execution_failed_get_blockchain(mocked_provider,
-                                               mocked_checksum,
-                                               mocked_contract,
-                                               moocked_check_balance,
-                                               mocked_unclaimed_slp,
-                                               mock_get_jwt,
-                                               mock_get_nonce,
-                                               mocked_sign_transaction,
-                                               mock_raw_send,
-                                               mock_receipt,
-                                               mock_keccak,
-                                               mock_to_hex):
+async def test_async_execute_failed_get_blockchain(mocked_provider,
+                                                   mocked_checksum,
+                                                   mocked_contract,
+                                                   moocked_check_balance,
+                                                   mocked_unclaimed_slp,
+                                                   mock_get_jwt,
+                                                   mock_get_nonce,
+                                                   mocked_sign_transaction,
+                                                   mock_raw_send,
+                                                   mock_receipt,
+                                                   mock_keccak,
+                                                   mock_to_hex):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post(
             "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
@@ -326,7 +326,123 @@ async def test_execution_failed_get_blockchain(mocked_provider,
             }
         )
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
-        await c.execute()
+        await c.async_execute()
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER_FREE,
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+    )
+    mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
+    moocked_check_balance.assert_not_called()
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.private_key == "0x00003A01C01173D676B64123".lower()
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_not_called()
+    mocked_sign_transaction.assert_not_called()
+    mock_raw_send.assert_not_called()
+    mock_receipt.assert_not_called()
+    mock_keccak.assert_not_called()
+    mock_to_hex.assert_not_called()
+
+
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("web3.eth.Eth.account.sign_transaction")
+@patch("axie_utils.claims.get_nonce", return_value=1)
+@patch("axie_utils.Claim.get_jwt", return_value="token")
+@patch("axie_utils.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie_utils.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_claim_execution(mocked_provider,
+                         mocked_checksum,
+                         mocked_contract,
+                         moocked_check_balance,
+                         mocked_unclaimed_slp,
+                         mock_get_jwt,
+                         mock_get_nonce,
+                         mocked_sign_transaction,
+                         mock_raw_send,
+                         mock_receipt,
+                         mock_keccak,
+                         mock_to_hex):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post(
+            "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+            json={
+                "blockchain_related": {
+                    "signature": {
+                        "amount": "456",
+                        "timestamp": str(int(datetime.now().timestamp())),
+                        "signature": "0xsignature"
+                    }
+                }
+            }
+        )
+        c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
+        c.execute()
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER_FREE,
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+    )
+    mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
+    moocked_check_balance.assert_called_with("0xfoo")
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.private_key == "0x00003A01C01173D676B64123".lower()
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_called_with("0xfoo")
+    mocked_sign_transaction.assert_called_once()
+    mock_raw_send.assert_called_once()
+    mock_receipt.assert_called_with("transaction_hash")
+    mock_keccak.assert_called_once()
+    mock_to_hex.assert_called_with("result_of_keccak")
+
+
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("web3.eth.Eth.account.sign_transaction")
+@patch("axie_utils.claims.get_nonce", return_value=1)
+@patch("axie_utils.Claim.get_jwt", return_value="token")
+@patch("axie_utils.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie_utils.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_execution_failed_get_blockchain(mocked_provider,
+                                         mocked_checksum,
+                                         mocked_contract,
+                                         moocked_check_balance,
+                                         mocked_unclaimed_slp,
+                                         mock_get_jwt,
+                                         mock_get_nonce,
+                                         mocked_sign_transaction,
+                                         mock_raw_send,
+                                         mock_receipt,
+                                         mock_keccak,
+                                         mock_to_hex):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post(
+            "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+            json={
+                "blockchain_related": {
+                    "signature": {
+                        "amount": "",
+                        "timestamp": 0,
+                        "signature": ""
+                    }
+                }
+            }
+        )
+        c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
+        c.execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
@@ -624,21 +740,21 @@ def test_jwq_fail_req_content_2_trezor(
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_claim_execution_trezor(mocked_provider,
-                                      mocked_checksum,
-                                      mocked_contract,
-                                      moocked_check_balance,
-                                      mocked_unclaimed_slp,
-                                      mock_get_jwt,
-                                      mock_get_nonce,
-                                      mocked_sign_transaction,
-                                      mock_raw_send,
-                                      mock_receipt,
-                                      mock_keccak,
-                                      mock_to_hex,
-                                      mocked_to_bytes,
-                                      mock_rlp,
-                                      mocked_parse):
+async def test_claim_async_execute_trezor(mocked_provider,
+                                          mocked_checksum,
+                                          mocked_contract,
+                                          moocked_check_balance,
+                                          mocked_unclaimed_slp,
+                                          mock_get_jwt,
+                                          mock_get_nonce,
+                                          mocked_sign_transaction,
+                                          mock_raw_send,
+                                          mock_receipt,
+                                          mock_keccak,
+                                          mock_to_hex,
+                                          mocked_to_bytes,
+                                          mock_rlp,
+                                          mocked_parse):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='SLP_ABI')):
@@ -656,7 +772,7 @@ async def test_claim_execution_trezor(mocked_provider,
                 }
             )
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
-            await c.execute()
+            await c.async_execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
@@ -696,21 +812,21 @@ async def test_claim_execution_trezor(mocked_provider,
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_execution_failed_get_blockchain_trezor(mocked_provider,
-                                                      mocked_checksum,
-                                                      mocked_contract,
-                                                      moocked_check_balance,
-                                                      mocked_unclaimed_slp,
-                                                      mock_get_jwt,
-                                                      mock_get_nonce,
-                                                      mocked_sign_transaction,
-                                                      mock_raw_send,
-                                                      mock_receipt,
-                                                      mock_keccak,
-                                                      mock_to_hex,
-                                                      mocked_to_bytes,
-                                                      mock_rlp,
-                                                      mocked_parse):
+async def test_async_execute_failed_get_blockchain_trezor(mocked_provider,
+                                                          mocked_checksum,
+                                                          mocked_contract,
+                                                          moocked_check_balance,
+                                                          mocked_unclaimed_slp,
+                                                          mock_get_jwt,
+                                                          mock_get_nonce,
+                                                          mocked_sign_transaction,
+                                                          mock_raw_send,
+                                                          mock_receipt,
+                                                          mock_keccak,
+                                                          mock_to_hex,
+                                                          mocked_to_bytes,
+                                                          mock_rlp,
+                                                          mocked_parse):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='SLP_ABI')):
@@ -728,7 +844,149 @@ async def test_execution_failed_get_blockchain_trezor(mocked_provider,
                 }
             )
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
-            await c.execute()
+            await c.async_execute()
+        mocked_provider.assert_called_with(
+            RONIN_PROVIDER_FREE,
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+        )
+        mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
+        mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
+        moocked_check_balance.assert_not_called()
+        mocked_unclaimed_slp.assert_called_once()
+        mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
+        assert c.bip_path == "parsed_path"
+        assert c.client == "client"
+        assert c.account == "0xfoo"
+        mock_get_jwt.assert_called_once()
+        mock_get_nonce.assert_not_called()
+        mocked_sign_transaction.assert_not_called()
+        mock_raw_send.assert_not_called()
+        mock_receipt.assert_not_called()
+        mock_keccak.assert_not_called()
+        mock_to_hex.assert_not_called()
+        mock_rlp.assert_not_called()
+        mocked_to_bytes.assert_not_called()
+
+
+@patch("axie_utils.graphql.parse_path", return_value="parsed_path")
+@patch("axie_utils.claims.rlp.encode")
+@patch("web3.Web3.toBytes")
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("axie_utils.claims.ethereum.sign_tx")
+@patch("axie_utils.claims.get_nonce", return_value=1)
+@patch("axie_utils.claims.TrezorClaim.get_jwt", return_value="token")
+@patch("axie_utils.claims.TrezorClaim.has_unclaimed_slp", return_value=456)
+@patch("axie_utils.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_claim_execute_trezor(mocked_provider,
+                              mocked_checksum,
+                              mocked_contract,
+                              moocked_check_balance,
+                              mocked_unclaimed_slp,
+                              mock_get_jwt,
+                              mock_get_nonce,
+                              mocked_sign_transaction,
+                              mock_raw_send,
+                              mock_receipt,
+                              mock_keccak,
+                              mock_to_hex,
+                              mocked_to_bytes,
+                              mock_rlp,
+                              mocked_parse):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='SLP_ABI')):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post(
+                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                json={
+                    "blockchain_related": {
+                        "signature": {
+                            "amount": "456",
+                            "timestamp": str(int(datetime.now().timestamp())),
+                            "signature": "0xsignature"
+                        }
+                    }
+                }
+            )
+            c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
+            c.execute()
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER_FREE,
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+    )
+    mocked_to_bytes.assert_called()
+    mock_rlp.assert_called()
+    mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
+    mocked_contract.assert_called_with(address="checksum", abi=SLP_ABI)
+    moocked_check_balance.assert_called_with("0xfoo")
+    mocked_unclaimed_slp.assert_called_once()
+    mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
+    assert c.bip_path == "parsed_path"
+    assert c.client == "client"
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_called_with("0xfoo")
+    mocked_sign_transaction.assert_called_once()
+    mock_raw_send.assert_called_once()
+    mock_receipt.assert_called_with("transaction_hash")
+    mock_keccak.assert_called_once()
+    mock_to_hex.assert_called_with("result_of_keccak")
+
+
+@patch("axie_utils.graphql.parse_path", return_value="parsed_path")
+@patch("axie_utils.claims.rlp.encode")
+@patch("web3.Web3.toBytes")
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("axie_utils.claims.ethereum.sign_tx")
+@patch("axie_utils.claims.get_nonce", return_value=1)
+@patch("axie_utils.claims.TrezorClaim.get_jwt", return_value="token")
+@patch("axie_utils.claims.TrezorClaim.has_unclaimed_slp", return_value=456)
+@patch("axie_utils.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_execute_failed_get_blockchain_trezor(mocked_provider,
+                                              mocked_checksum,
+                                              mocked_contract,
+                                              moocked_check_balance,
+                                              mocked_unclaimed_slp,
+                                              mock_get_jwt,
+                                              mock_get_nonce,
+                                              mocked_sign_transaction,
+                                              mock_raw_send,
+                                              mock_receipt,
+                                              mock_keccak,
+                                              mock_to_hex,
+                                              mocked_to_bytes,
+                                              mock_rlp,
+                                              mocked_parse):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='SLP_ABI')):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post(
+                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                json={
+                    "blockchain_related": {
+                        "signature": {
+                            "amount": "",
+                            "timestamp": 0,
+                            "signature": ""
+                        }
+                    }
+                }
+            )
+            c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
+            c.execute()
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
