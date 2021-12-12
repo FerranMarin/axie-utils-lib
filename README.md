@@ -3,9 +3,9 @@
 
 I created [Axie Scholar Utilities](https://github.com/FerranMarin/axie-scholar-utilities/edit/main/README.md) a CLI tool that automates various activities related to manage Axie Infinity Scholarships.
 
-This library is born from the need to re-use some of my code for other projects, something like a GUI or a discord bot. This will enable such things. It is also a good point for other developers to also use what I've already built and use it as a base.
+This library is born from the need to re-use some of my code for other projects, something like a GUI or a discord bot. This will enable such things. It is also a good starting point for other developers to also use what I've already built and use it as a base.
 
-This library has then NO monetization so it is free to use, of course, but I would appreciate any donnations to incentivize me to mantain it!
+This library has NO monetization so it is free to use, of course, I would appreciate any donnations to incentivize me to mantain it!
 
 # Donations
 
