@@ -74,7 +74,10 @@ c = Claim(
     account="ronin:where_to_claim_slp",
     private_key="0xaccount_private_key"
 )
-await c.execute()
+c.execute()
+
+# or asynchronously
+ await c.async_execute()
 
 # Get JWT
 
@@ -161,7 +164,11 @@ c = TrezorClaim(
     client=client,
     bip_path="m/44'/60'/0'/0/0"
 )
-await c.execute()
+
+c.execute()
+
+# or asynchronously
+ await c.async_execute()
 
 # Get JWT
 
