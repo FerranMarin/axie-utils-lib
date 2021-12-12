@@ -1,5 +1,6 @@
 # Axie Utils Library
 [![CI](https://github.com/FerranMarin/axie-utils-lib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/FerranMarin/axie-utils-lib/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/axie-utils.svg)](https://badge.fury.io/py/axie-utils)
 
 I created [Axie Scholar Utilities](https://github.com/FerranMarin/axie-scholar-utilities/edit/main/README.md) a CLI tool that automates various activities related to manage Axie Infinity Scholarships.
 
