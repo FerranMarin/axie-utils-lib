@@ -1,6 +1,4 @@
-import builtins
-
-from mock import patch, mock_open
+from mock import patch
 
 from axie_utils import Breed, TrezorBreed
 from axie_utils.abis import AXIE_ABI

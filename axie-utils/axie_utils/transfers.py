@@ -1,6 +1,5 @@
 import logging
 import rlp
-import json
 from datetime import datetime, timedelta
 from time import sleep
 

@@ -1,7 +1,6 @@
-import builtins
 from datetime import datetime, timedelta
 
-from mock import patch, call, mock_open
+from mock import patch, call
 from freezegun import freeze_time
 import requests_mock
 import pytest

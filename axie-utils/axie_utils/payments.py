@@ -1,4 +1,3 @@
-import json
 import rlp
 import logging
 from datetime import datetime, timedelta

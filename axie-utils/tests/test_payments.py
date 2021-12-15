@@ -1,6 +1,4 @@
-import builtins
-
-from mock import patch, call, mock_open
+from mock import patch, call
 
 from axie_utils import Payment, TrezorPayment
 from axie_utils.abis import SLP_ABI
