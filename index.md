@@ -107,6 +107,7 @@ from axie_utils import (
     TrezorAxieGraphQL,
     TrezorBreed,
     TrezorClaim,
+    TrezorConfig,
     TrezorMorph,
     TrezorPayment,
     TrezorTransfer)
@@ -116,6 +117,16 @@ client = get_default_client(
     # Passphrase can be empty ''. You can also not use the CustomUI, but it will ask the user for the passphrase later on
     ui=CustomUI(passphrase='passphrase'))
 
+# Helper to find your bip paths
+# resp will be a dictionary containing each address as a key and a dictionary with "bip_path" and "passphrase" as value
+# In this example we simulate a trezor device that has 10 addreses with no passphrase
+
+tc = TrezorConfig(10)
+resp = tc.list_bip_paths()
+
+# This example does have a passphrase and 50 addreses
+other_tc = TrezorConfig(50, 'foo')
+resp = tc.list_bip_paths()
 
 # Transfer Axies
 t = TrezorTransfer(
