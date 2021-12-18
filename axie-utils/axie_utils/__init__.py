@@ -1,4 +1,4 @@
-__version__ = '1.0.4'
+__version__ = '1.1.0'
 __all__ = [
     'Axies',
     'AxieGraphQL',
@@ -11,6 +11,7 @@ __all__ = [
     'TrezorAxieGraphQL',
     'TrezorBreed',
     'TrezorClaim',
+    'TrezorConfig',
     'TrezorMorph',
     'TrezorPayment',
     'TrezorTransfer',
@@ -25,4 +26,4 @@ from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 from axie_utils.morphing import Morph, TrezorMorph
 from axie_utils.payments import Payment, TrezorPayment
 from axie_utils.transfers import Transfer, TrezorTransfer
-from axie_utils.utils import get_nonce, check_balance, CustomUI
+from axie_utils.utils import get_nonce, check_balance, CustomUI, TrezorConfig

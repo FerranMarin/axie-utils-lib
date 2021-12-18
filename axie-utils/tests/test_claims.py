@@ -10,7 +10,7 @@ from eth_account.messages import encode_defunct
 from axie_utils import Claim, TrezorClaim
 from axie_utils.abis import SLP_ABI
 from axie_utils.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
-from tests.test_utils import MockedSignedMsg
+from tests.utils import MockedSignedMsg
 
 
 @patch("web3.eth.Eth.contract")

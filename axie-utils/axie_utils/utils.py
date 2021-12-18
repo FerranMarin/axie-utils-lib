@@ -1,6 +1,9 @@
 from requests.packages.urllib3.util.retry import Retry
 from web3 import Web3
 from trezorlib.ui import ClickUI
+from trezorlib.client import get_default_client
+from trezorlib.tools import parse_path
+from trezorlib import ethereum
 
 from axie_utils.abis import BALANCE_ABI
 
@@ -70,3 +73,20 @@ class CustomUI(ClickUI):
 
     def get_passphrase(self, *args, **kwargs):
         return self.passphrase
+
+
+class TrezorConfig:
+    def __init__(self, accounts_number, passphrase=None):
+        self.accounts_number = accounts_number
+        self.passphrase = '' if not passphrase else passphrase
+
+    def list_bip_paths(self):
+        response = {}
+        ui = CustomUI(passphrase=self.passphrase)
+        for i in range(self.accounts_number):
+            bip_path = f"m/44'/60'/0'/0/{i}"
+            client = get_default_client(ui=ui)
+            ronin = ethereum.get_address(client, parse_path(bip_path), True).lower().replace('0x', 'ronin:')
+            response[ronin] = {"passphrase": self.passphrase, "bip_path": bip_path}
+
+        return response

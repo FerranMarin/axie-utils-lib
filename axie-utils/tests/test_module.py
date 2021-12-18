@@ -2,7 +2,7 @@ import axie_utils
 
 
 def test_version():
-    assert axie_utils.__version__ == '1.0.4'
+    assert axie_utils.__version__ == '1.1.0'
 
 
 def test_init():
@@ -18,6 +18,7 @@ def test_init():
         'TrezorAxieGraphQL',
         'TrezorBreed',
         'TrezorClaim',
+        'TrezorConfig',
         'TrezorMorph',
         'TrezorPayment',
         'TrezorTransfer',

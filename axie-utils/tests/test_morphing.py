@@ -4,7 +4,7 @@ from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie_utils.morphing import Morph, TrezorMorph
-from tests.test_utils import MockedSignedMsg
+from tests.utils import MockedSignedMsg
 
 
 def test_morph_init():
