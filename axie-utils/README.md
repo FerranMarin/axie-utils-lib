@@ -16,7 +16,7 @@ pip install -U axie-utils
 This example would send 100 SLP from `ronin:from_where_to_send_SLP` to `ronin:to_where_we_send_SLP`.
 
 ``` python
-from axie-utils import Payment
+from axie_utils import Payment
 
 p = Payment(
     "Testing Account",
@@ -31,7 +31,7 @@ p.execute()
 This example, shows how we would claim SLP from an account.
 
 ``` python
-from axie-utils import Claim
+from axie_utils import Claim
 
 c = Claim(
     "Testing Account",
