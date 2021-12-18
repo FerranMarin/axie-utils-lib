@@ -19,7 +19,7 @@ pip install -U axie-utils
 ## Non-Trezor
 
 ```python
-from axie-utils import (
+from axie_utils import (
     Axies,
     AxieGraphQL,
     Breed,
@@ -102,7 +102,7 @@ nonce = get_nonce("ronin:to_check_its_nonce")
 ## Trezor
 
 ```python
-from axie-utils import (
+from axie_utils import (
     CustomUI,
     TrezorAxieGraphQL,
     TrezorBreed,
