@@ -2,7 +2,7 @@ import axie_utils
 
 
 def test_version():
-    assert axie_utils.__version__ == '1.1.0'
+    assert axie_utils.__version__ == '1.1.1'
 
 
 def test_init():
@@ -23,4 +23,5 @@ def test_init():
         'TrezorPayment',
         'TrezorTransfer',
         'get_nonce',
+        'get_lastclaim',
         'check_balance']

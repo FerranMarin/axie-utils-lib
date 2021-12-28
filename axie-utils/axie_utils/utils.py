@@ -1,3 +1,8 @@
+import logging
+from datetime import datetime
+from json.decoder import JSONDecodeError
+
+import requests
 from requests.packages.urllib3.util.retry import Retry
 from web3 import Web3
 from trezorlib.ui import ClickUI
@@ -64,6 +69,20 @@ def get_nonce(account):
         Web3.toChecksumAddress(account.replace("ronin:", "0x"))
     )
     return nonce
+
+
+def get_lastclaim(account):
+    url = f'https://game-api.skymavis.com/game-api/clients/{account.replace("ronin:", "0x")}/items/1'
+    try:
+        r = requests.get(url)
+        rjs = r.json()
+        if rjs.get('last_claimed_item_at'):
+            date = datetime.fromtimestamp(rjs['last_claimed_item_at'])
+            return date
+    except JSONDecodeError:
+        logging.critical('Something went wrong getting last claim')
+
+    return None
 
 
 class CustomUI(ClickUI):
