@@ -74,7 +74,34 @@ class Axies:
                 # In case we want to check correctly morphed
                 body_shape = json_response["data"]["axie"]["bodyShape"]
                 birth_date = json_response["data"]["axie"]["birthDate"]
-                morph_date = datetime.fromtimestamp(birth_date) + timedelta(days=5)
+                morph_date = datetime.utcfromtimestamp(birth_date) + timedelta(days=5)
                 return morph_date, body_shape
 
         return None, None
+
+    @staticmethod
+    def get_axie_details(axie_id):
+        payload = {
+            "operationName": "GetAxieDetail",
+            "variables":
+                {"axieId": axie_id},
+            "query": "query GetAxieDetail($axieId: ID!) { axie(axieId: $axieId) "
+            "{ ...AxieDetail }} fragment AxieDetail on Axie "
+            "{ id parts { ...AxiePart }} fragment AxiePart on AxiePart "
+            "{ id name class type }"
+        }
+        url = "https://graphql-gateway.axieinfinity.com/graphql"
+        response = requests.post(url, json=payload)
+        try:
+            json_response = response.json()
+        except json.decoder.JSONDecodeError:
+            logging.debug("Response contains no json info")
+            return None
+        if ("data" in json_response and 
+            "axie" in json_response['data'] and 
+            "parts" in json_response['data']['axie']):
+            parts = {}
+            for part in json_response['data']['axie']['parts']:
+                parts[part['type'].lower()] = part['name'].lower()
+            return parts
+        return None

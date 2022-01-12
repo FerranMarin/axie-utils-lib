@@ -181,3 +181,50 @@ def test_get_morph_date_body_malformed_json(mocked_json):
         a = Axies("ronin:abc1")
         resp = a.get_morph_date_and_body(123)
     assert resp == (None, None)
+
+
+def test_get_axie_details_success():
+    mocked_json = {
+        'data': {
+            'axie': {
+                'id': '123',
+                'parts': [
+                    {'id': 'eyes-clear', 'name': 'Clear', 'class': 'Aquatic', 'type': 'Eyes'},
+                    {'id': 'ears-inkling', 'name': 'Inkling', 'class': 'Aquatic', 'type': 'Ears'},
+                    {'id': 'back-goldfish', 'name': 'Goldfish', 'class': 'Aquatic', 'type': 'Back'},
+                    {'id': 'mouth-risky-fish', 'name': 'Risky Fish', 'class': 'Aquatic', 'type': 'Mouth'},
+                    {'id': 'horn-shoal-star', 'name': 'Shoal Star', 'class': 'Aquatic', 'type': 'Horn'},
+                    {'id': 'tail-nimo', 'name': 'Nimo', 'class': 'Aquatic', 'type': 'Tail'}
+                ]
+            }
+        }
+    }
+    expected_response = {
+        'eyes': 'clear',
+        'ears': 'inkling',
+        'back': 'goldfish',
+        'mouth': 'risky fish',
+        'horn': 'shoal star',
+        'tail': 'nimo'
+    }
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json=mocked_json)
+        a = Axies("ronin:abc1")
+        resp = a.get_axie_details(123)
+    assert resp == expected_response
+
+
+def test_get_axie_details_incomplete_data():
+    mocked_json = {'data': {'axie': {'id': '123'}}}
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json=mocked_json)
+        a = Axies("ronin:abc1")
+        resp = a.get_axie_details(123)
+    assert resp == None
+
+def test_get_axie_details_fail_req():
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", status_code=500)
+        a = Axies("ronin:abc1")
+        resp = a.get_axie_details(123)
+    assert resp == None
