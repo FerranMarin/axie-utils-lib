@@ -51,7 +51,8 @@ class Axies:
             axies.append(axie)
         return axies
 
-    def get_morph_date_and_body(self, axie_id):
+    @staticmethod
+    def get_morph_date_and_body(axie_id):
         payload = {
             "operationName": "GetAxieDetail",
             "variables":
