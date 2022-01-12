@@ -33,7 +33,7 @@ def test_get_lastclaim():
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get(url, json={"last_claimed_item_at": 1640649715})
         d = get_lastclaim(account)
-    assert d == datetime(2021, 12, 28, 1, 1, 55)
+    assert d == datetime(2021, 12, 28, 0, 1, 55)
 
 
 def test_get_lastclaim_missing_data():

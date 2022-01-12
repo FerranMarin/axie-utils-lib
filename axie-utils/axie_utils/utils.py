@@ -77,7 +77,7 @@ def get_lastclaim(account):
         r = requests.get(url)
         rjs = r.json()
         if rjs.get('last_claimed_item_at'):
-            date = datetime.fromtimestamp(rjs['last_claimed_item_at'])
+            date = datetime.utcfromtimestamp(rjs['last_claimed_item_at'])
             return date
     except JSONDecodeError:
         logging.critical('Something went wrong getting last claim')
