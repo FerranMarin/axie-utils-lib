@@ -188,6 +188,7 @@ def test_get_axie_details_success():
         'data': {
             'axie': {
                 'id': '123',
+                'class': 'Beast',
                 'parts': [
                     {'id': 'eyes-clear', 'name': 'Clear', 'class': 'Aquatic', 'type': 'Eyes'},
                     {'id': 'ears-inkling', 'name': 'Inkling', 'class': 'Aquatic', 'type': 'Ears'},
@@ -205,7 +206,8 @@ def test_get_axie_details_success():
         'back': 'goldfish',
         'mouth': 'risky fish',
         'horn': 'shoal star',
-        'tail': 'nimo'
+        'tail': 'nimo',
+        'class': 'beast'
     }
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json=mocked_json)

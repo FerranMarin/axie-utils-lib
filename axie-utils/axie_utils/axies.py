@@ -87,7 +87,7 @@ class Axies:
                 {"axieId": axie_id},
             "query": "query GetAxieDetail($axieId: ID!) { axie(axieId: $axieId) "
             "{ ...AxieDetail }} fragment AxieDetail on Axie "
-            "{ id parts { ...AxiePart }} fragment AxiePart on AxiePart "
+            "{ id class parts { ...AxiePart }} fragment AxiePart on AxiePart "
             "{ id name class type }"
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
@@ -103,5 +103,7 @@ class Axies:
             parts = {}
             for part in json_response['data']['axie']['parts']:
                 parts[part['type'].lower()] = part['name'].lower()
+            if "class" in json_response['data']['axie']:
+                parts['class'] = json_response['data']['axie']['class'].lower()
             return parts
         return None
