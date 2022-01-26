@@ -2,7 +2,7 @@
 [![CI](https://github.com/FerranMarin/axie-utils-lib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/FerranMarin/axie-utils-lib/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/axie-utils.svg)](https://badge.fury.io/py/axie-utils)
 
-I created [Axie Scholar Utilities](https://github.com/FerranMarin/axie-scholar-utilities/edit/main/README.md) a CLI tool that automates various activities related to manage Axie Infinity Scholarships.
+I created [Axie Scholar Utilities](https://github.com/FerranMarin/axie-scholar-utilities) a CLI tool that automates various activities related to manage Axie Infinity Scholarships.
 
 This library is born from the need to re-use some of my code for other projects, something like a GUI or a discord bot. This will enable such things. It is also a good starting point for other developers to also use what I've already built and use it as a base.
 
