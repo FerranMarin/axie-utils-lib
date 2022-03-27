@@ -205,6 +205,9 @@ class Scatter:
             return self.execute_ron(gas_price, nonce)
         return self.execute_token(gas_price, nonce)
 
+    def __str__(self):
+        return f"Scatter of {self.token} from {self.from_acc.replace('0x', 'ronin:')}"
+
 
 class TrezorScatter:
     def __init__(self, token, from_acc, client, bip_path, to_ronin_ammount_dict):
@@ -421,3 +424,6 @@ class TrezorScatter:
         if self.token == 'ron':
             return self.execute_ron(gas_price, nonce)
         return self.execute_token(gas_price, nonce)
+
+    def __str__(self):
+        return f"Scatter of {self.token} from {self.from_acc.replace('0x', 'ronin:')}"
