@@ -5,6 +5,7 @@ It does support trezor and non-trezor operations.
 
 **Trezor Disclaimer**: _Current version supports Trezor One version 1.8.0 and up, and Trezor T version 2.1.0 and up._
 
+**Note: From version 2 onwards, transactions use RON, if you wish to continue executing free transactions, please use v1 or modify the library accordingly**
 
 # Installation
 
@@ -29,7 +30,8 @@ from axie_utils import (
     Payment,
     Transfer,
     get_nonce,
-    check_balance)
+    check_balance,
+    Scatter)
 
 
 # Transfer Axies
@@ -95,8 +97,25 @@ slp_balance = check_balance("ronin:to_check_the_balance", 'slp')
 axs_balance = check_balance("ronin:to_check_the_balance", 'axs')
 axies_balance = check_balance("ronin:to_check_the_balance", 'axies')
 weth_balance = check_balance("ronin:to_check_the_balance", 'weth')
+usdc_balance = check_balance("ronin:to_check_the_balance", 'usdc')
+ron_balance = check_balance("ronin:to_check_the_balance", 'ron')
 
 nonce = get_nonce("ronin:to_check_its_nonce")
+
+# Scatter any ERC20 Token (slp, axs, weth, usdc, ron)
+
+s = Scatter(
+    token='slp', # Just change the token to send any other token
+    from_acc="ronin:where_token_come_from",
+    from_private='0xfrom_acc_private_key",
+    to_ronin_ammount_dict={
+        "ronin:where_to_send_1": 123,
+        "ronin:where_to_send_2": 45,
+        "ronin:where_to_send_3": 145
+    }
+)
+
+
 ```
 
 ## Trezor
@@ -110,7 +129,9 @@ from axie_utils import (
     TrezorConfig,
     TrezorMorph,
     TrezorPayment,
-    TrezorTransfer)
+    TrezorTransfer,
+    TrezorScatter)
+
 from trezorlib.client import get_default_client
 
 client = get_default_client(
@@ -190,6 +211,22 @@ g = TrezorAxieGraphQL(
 )
 g.get_jwt()
 g.create_random_msg()
+
+# Scatter any ERC20 Token (slp, axs, weth, usdc, ron)
+
+s = Scatter(
+    token='slp', # Just change the token to send any other token
+    from_acc="ronin:where_token_come_from",
+    client=client,
+    bip_path="m/44'/60'/0'/0/0",
+    to_ronin_ammount_dict={
+        "ronin:where_to_send_1": 123,
+        "ronin:where_to_send_2": 45,
+        "ronin:where_to_send_3": 145
+    }
+)
+
+
 ```
 
 Note: To create the QRCode scholars use to play, all you need to do is encode the JWT as a qrcode.
