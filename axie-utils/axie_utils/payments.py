@@ -140,14 +140,14 @@ class TrezorPayment:
             self.client,
             n=self.bip_path,
             nonce=nonce,
-            gas_price=self.gwei,
+            gas_price=self.w3.toWei(str(gas_price), "gwei"),
             gas_limit=self.gas,
             to=SLP_CONTRACT,
             value=0,
             data=data,
             chain_id=2020
         )
-        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
+        transaction = rlp.encode((nonce, self.w3.toWei(str(gas_price), 'gwei'), self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         _hash = self.w3.toHex(self.w3.keccak(transaction))

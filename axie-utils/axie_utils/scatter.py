@@ -1,5 +1,3 @@
-from axie_utils import check_balance
-from eth_utils import to_checksum_address
 import rlp
 import logging
 from datetime import datetime, timedelta
@@ -12,6 +10,7 @@ from web3 import Web3, exceptions
 from axie_utils.abis import SCATTER_ABI, BALANCE_ABI
 from axie_utils.utils import (
     get_nonce,
+    check_balance,
     SCATTER_CONTRACT,
     TOKENS,
     RONIN_PROVIDER,
@@ -203,7 +202,7 @@ class Scatter:
             self.increase_gas_tx(nonce)
 
 
-class Scatter:
+class TrezorScatter:
     def __init__(self, token, from_acc, client, bip_path, to_ronin_ammount_dict):
         self.w3 = Web3(
             Web3.HTTPProvider(

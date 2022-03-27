@@ -2,7 +2,7 @@ from mock import patch
 
 from axie_utils import Breed, TrezorBreed
 from axie_utils.abis import AXIE_ABI
-from axie_utils.utils import AXIE_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
+from axie_utils.utils import AXIE_CONTRACT, RONIN_PROVIDER, USER_AGENT
 
 
 def test_breed_init():
@@ -39,7 +39,7 @@ def test_breed_execute(mocked_provider,
     b.execute()
     mock_get_nonce.assert_called_once()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
@@ -91,7 +91,7 @@ def test_trezorbreed_execute(mocked_provider,
     mock_rlp.assert_called()
     mock_get_nonce.assert_called_once()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
