@@ -61,7 +61,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
 
 
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
-@patch("axie_utils.Payment.send_replacement_tx")
+@patch("axie_utils.Payment.increase_gas_tx")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.account.sign_transaction")
 @patch("web3.eth.Eth.send_raw_transaction")
@@ -76,7 +76,7 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             mock_send,
                                             mock_sign,
                                             mock_checksum,
-                                            mock_replacement_tx,
+                                            mock_increase_gas_tx,
                                             _):
     p = Payment(
         "random_account",
@@ -96,7 +96,7 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
         call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
-    mock_replacement_tx.assert_called_with(123)
+    mock_increase_gas_tx.assert_called_with(123)
 
 
 @patch("axie_utils.payments.rlp.encode")
@@ -151,8 +151,8 @@ def test_execute_calls_web3_functions_trezor(mock_transaction_receipt,
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 0})
-@patch("axie_utils.payments.TrezorPayment.send_replacement_tx")
-def test_execute_calls_web3_functions_retry_trezor(mock_replacement_tx,
+@patch("axie_utils.payments.TrezorPayment.increase_gas_tx")
+def test_execute_calls_web3_functions_retry_trezor(mock_increase_gas_tx,
                                                    mock_transaction_receipt,
                                                    mock_contract,
                                                    mock_keccak,
@@ -183,4 +183,4 @@ def test_execute_calls_web3_functions_retry_trezor(mock_replacement_tx,
         call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
-    mock_replacement_tx.assert_called_with(123)
+    mock_increase_gas_tx.assert_called_with(123)

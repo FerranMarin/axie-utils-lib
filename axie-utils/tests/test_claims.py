@@ -9,7 +9,7 @@ from eth_account.messages import encode_defunct
 
 from axie_utils import Claim, TrezorClaim
 from axie_utils.abis import SLP_ABI
-from axie_utils.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
+from axie_utils.utils import SLP_CONTRACT, RONIN_PROVIDER, USER_AGENT
 from tests.utils import MockedSignedMsg
 
 
@@ -19,7 +19,7 @@ from tests.utils import MockedSignedMsg
 def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
     c = Claim(account="ronin:foo", private_key="bar", acc_name="test_acc")
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -45,7 +45,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
         assert unclaimed == 2
     mocked_check.assert_called_with("0xfoo")
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -63,7 +63,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
         unclaimed = c.has_unclaimed_slp()
         assert unclaimed is None
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -115,7 +115,7 @@ def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_
         }
         assert req_mocker.request_history[0].json() == expected_payload
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -136,7 +136,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
         jwt = c.get_jwt()
         assert jwt is None
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -186,7 +186,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
         assert jwt is None
         assert req_mocker.request_history[0].json() == expected_payload
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -222,7 +222,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
         assert req_mocker.request_history[0].json() == expected_payload
         assert jwt is None
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -271,7 +271,7 @@ async def test_claim_async_execute(mocked_provider,
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
         await c.async_execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
@@ -330,7 +330,7 @@ async def test_async_execute_failed_get_blockchain(mocked_provider,
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
         await c.async_execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
@@ -388,7 +388,7 @@ def test_claim_execution(mocked_provider,
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
         c.execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
@@ -446,7 +446,7 @@ def test_execution_failed_get_blockchain(mocked_provider,
         c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
         c.execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
@@ -474,7 +474,7 @@ def test_trezor_claim_init(mocked_provider, mocked_checksum, mocked_contract, mo
                       mock_open(read_data='SLP_ABI')):
         c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -507,7 +507,7 @@ def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contr
         mocked_check.assert_called_with("0xfoo")
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -530,7 +530,7 @@ def test_has_unclaimed_slp_failed_req_trezor(mocked_provider, mocked_checksum, m
             assert unclaimed is None
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -589,7 +589,7 @@ def test_get_jwt_trezor(mocked_provider, mocked_checksum, mocked_random_msg, moc
         assert req_mocker.request_history[0].json() == expected_payload
     mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -618,7 +618,7 @@ def test_get_jwt_fail_req_trezor(
         assert jwt is None
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -676,7 +676,7 @@ def test_jwq_fail_req_content_trezor(
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         assert req_mocker.request_history[0].json() == expected_payload
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -720,7 +720,7 @@ def test_jwq_fail_req_content_2_trezor(
         assert jwt is None
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -778,7 +778,7 @@ async def test_claim_async_execute_trezor(mocked_provider,
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             await c.async_execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_to_bytes.assert_called()
@@ -850,7 +850,7 @@ async def test_async_execute_failed_get_blockchain_trezor(mocked_provider,
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             await c.async_execute()
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
@@ -921,7 +921,7 @@ def test_claim_execute_trezor(mocked_provider,
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             c.execute()
     mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
+        RONIN_PROVIDER,
         request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_to_bytes.assert_called()
@@ -992,7 +992,7 @@ def test_execute_failed_get_blockchain_trezor(mocked_provider,
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             c.execute()
         mocked_provider.assert_called_with(
-            RONIN_PROVIDER_FREE,
+            RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')

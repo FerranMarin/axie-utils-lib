@@ -10,7 +10,7 @@ from trezorlib import ethereum
 from axie_utils.abis import AXIE_ABI
 from axie_utils.utils import (
     get_nonce,
-    RONIN_PROVIDER_FREE,
+    RONIN_PROVIDER,
     AXIE_CONTRACT,
     TIMEOUT_MINS,
     USER_AGENT
@@ -21,7 +21,7 @@ class Breed:
     def __init__(self, sire_axie, matron_axie, address, private_key):
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
@@ -43,7 +43,7 @@ class Breed:
         ).buildTransaction({
             "chainId": 2020,
             "gas": 492874,
-            "gasPrice": self.w3.toWei("0", "gwei"),
+            "gasPrice": self.w3.toWei("1", "gwei"),
             "nonce": nonce
         })
         # Sign transaction
@@ -53,8 +53,8 @@ class Breed:
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
-        # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        # get transaction _hash
+        _hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish or timeout
         logging.info("{self} about to start!")
         start_time = datetime.now()
@@ -65,7 +65,7 @@ class Breed:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(_hash)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -78,6 +78,7 @@ class Breed:
 
         if success:
             logging.info(f"{self} completed successfully")
+            return _hash
         else:
             logging.info(f"{self} failed")
 
@@ -90,14 +91,14 @@ class TrezorBreed:
     def __init__(self, sire_axie, matron_axie, address, client, bip_path):
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
         self.client = client
         self.bip_path = parse_path(bip_path)
-        self.gwei = self.w3.toWei('0', 'gwei')
+        self.gwei = self.w3.toWei('1', 'gwei')
         self.gas = 250000
 
     def execute(self):
@@ -115,7 +116,7 @@ class TrezorBreed:
         ).buildTransaction({
             "chainId": 2020,
             "gas": self.gas,
-            "gasPrice": self.w3.toWei("0", "gwei"),
+            "gasPrice": self.gwei,
             "nonce": nonce
         })
         data = self.w3.toBytes(hexstr=breed_tx['data'])
@@ -134,8 +135,8 @@ class TrezorBreed:
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
-        # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(transaction))
+        # get transaction _hash
+        _hash = self.w3.toHex(self.w3.keccak(transaction))
         # Wait for transaction to finish or timeout
         logging.info("{self} about to start!")
         start_time = datetime.now()
@@ -146,7 +147,7 @@ class TrezorBreed:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(_hash)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -159,8 +160,10 @@ class TrezorBreed:
 
         if success:
             logging.info(f"{self} completed successfully")
+            return _hash
         else:
             logging.info(f"{self} failed")
+            return
 
     def __str__(self):
         return (f"Breeding axie {self.sire_axie} with {self.matron_axie} in account "

@@ -1,9 +1,18 @@
 from datetime import datetime
+from tabnanny import check
+from unittest import mock
 
-from mock import patch
+from mock import patch, call
 import requests_mock
 
-from axie_utils import TrezorConfig, get_lastclaim
+from axie_utils import TrezorConfig, get_lastclaim, check_balance
+from axie_utils.utils import (
+    AXIE_CONTRACT,
+    AXS_CONTRACT,
+    SLP_CONTRACT,
+    WETH_CONTRACT,
+    USDC_CONTRACT
+)
 
 
 def test_trezor_config_init():
@@ -52,3 +61,77 @@ def test_get_lastclaim_no_json():
         req_mocker.get(url)
         d = get_lastclaim(account)
     assert d == None
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
+def test_check_balance_slp(mocked_checksum, mock_contract):
+    balance = check_balance('account', 'slp')
+    mocked_checksum.assert_has_calls(calls=[
+        call(SLP_CONTRACT),
+        call("account")
+    ])
+    mock_contract.assert_called()
+    assert balance == 1
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
+def test_check_balance_axs(mocked_checksum, mock_contract):
+    balance = check_balance('account', 'axs')
+    mocked_checksum.assert_has_calls(calls=[
+        call(AXS_CONTRACT),
+        call("account")
+    ])
+    mock_contract.assert_called()
+    assert balance == 1
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
+def test_check_balance_axies(mocked_checksum, mock_contract):
+    balance = check_balance('account', 'axies')
+    mocked_checksum.assert_has_calls(calls=[
+        call(AXIE_CONTRACT),
+        call("account")
+    ])
+    mock_contract.assert_called()
+    assert balance == 1
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
+def test_check_balance_weth(mocked_checksum, mock_contract):
+    balance = check_balance('account', 'weth')
+    mocked_checksum.assert_has_calls(calls=[
+        call(WETH_CONTRACT),
+        call("account")
+    ])
+    mock_contract.assert_called()
+    assert balance == 1
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
+def test_check_balance_usdc(mocked_checksum, mock_contract):
+    balance = check_balance('account', 'usdc')
+    mocked_checksum.assert_has_calls(calls=[
+        call(USDC_CONTRACT),
+        call("account")
+    ])
+    mock_contract.assert_called()
+    assert balance == 1
+
+
+@patch("web3.eth.Eth.get_balance", return_value=123)
+@patch("web3.Web3.toChecksumAddress", return_value='addrs')
+def test_check_balance_ron(mocked_checksum, mocked_balance):
+    balance = check_balance('account', 'ron')
+    mocked_checksum.assert_called_with('account')
+    mocked_balance.assert_called_with('addrs')
+    assert balance == 123 / 1000000000000000000
+
+
+def test_check_balance_invalid():
+    balance = check_balance('account', 'foo')
+    assert balance == 0
