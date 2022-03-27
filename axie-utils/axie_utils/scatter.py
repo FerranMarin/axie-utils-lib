@@ -26,10 +26,11 @@ class Scatter:
                 RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.token = token.lower()
-        self.token_contract = self.w3.eth.contract(
-            address=Web3.toChecksumAddress(TOKENS[self.token]),
-            abi=BALANCE_ABI
-        )
+        if self.token != 'ron':
+            self.token_contract = self.w3.eth.contract(
+                address=Web3.toChecksumAddress(TOKENS[self.token]),
+                abi=BALANCE_ABI
+            )
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
         self.contract = self.w3.eth.contract(
@@ -38,17 +39,17 @@ class Scatter:
         )
         self.to_list = []
         self.amounts_list = []
-        for k,v in to_ronin_ammount_dict:
+        for k,v in to_ronin_ammount_dict.items():
             self.to_list.append(k)
             self.amounts_list.append(v)
    
     def is_contract_accepted(self):
-        allowance = self.token_contract.functions.allowace(
+        allowance = self.token_contract.functions.allowance(
             Web3.toChecksumAddress(self.from_acc),
             Web3.toChecksumAddress(SCATTER_CONTRACT)).call()
         if int(allowance) > sum(self.amounts_list):
             return True
-        self.approve_contract()
+        return self.approve_contract()
 
     def approve_contract(self):
         approve_tx = self.token_contract.functions.approve(
@@ -76,9 +77,7 @@ class Scatter:
         if nonce != get_nonce(self.from_acc):
             return
         # Increase gas price to get tx unstuck
-        if self.token == 'ron':
-            self.execute_ron(1.01, nonce)
-        self.execute_token(1.01, nonce)
+        return self.execute(1.01, nonce)
 
     def execute_token(self, gas_price=1, nonce=None):
         # Check token is approved
@@ -147,7 +146,7 @@ class Scatter:
     
     def execute_ron(self, gas_price=1, nonce=None):
         # Check enough balance is present
-        if check_balance(self.from_acc, 'ron') >= sum(self.amounts_list) + 0.011:
+        if not check_balance(self.from_acc, 'ron') >= (sum(self.amounts_list) + 0.011):
             logging.warning("Not enough RON balance to scatter and pay the tx.")
             return
                 
@@ -201,6 +200,11 @@ class Scatter:
             logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
 
+    def execute(self, gas_price=1, nonce=None):
+        if self.token == 'ron':
+            return self.execute_ron(gas_price, nonce)
+        return self.execute_token(gas_price, nonce)
+
 
 class TrezorScatter:
     def __init__(self, token, from_acc, client, bip_path, to_ronin_ammount_dict):
@@ -209,10 +213,11 @@ class TrezorScatter:
                 RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.token = token.lower()
-        self.token_contract = self.w3.eth.contract(
-            address=Web3.toChecksumAddress(TOKENS[self.token]),
-            abi=BALANCE_ABI
-        )
+        if self.token != 'ron':
+            self.token_contract = self.w3.eth.contract(
+                address=Web3.toChecksumAddress(TOKENS[self.token]),
+                abi=BALANCE_ABI
+            )
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.client = client
         self.bip_path = parse_path(bip_path)
@@ -222,12 +227,12 @@ class TrezorScatter:
         )
         self.to_list = []
         self.amounts_list = []
-        for k,v in to_ronin_ammount_dict:
+        for k,v in to_ronin_ammount_dict.items():
             self.to_list.append(k)
             self.amounts_list.append(v)
    
-    def is_contract_accepted(self):
-        allowance = self.token_contract.functions.allowace(
+    def is_contract_accepted(self):        
+        allowance = self.token_contract.functions.allowance(
             Web3.toChecksumAddress(self.from_acc),
             Web3.toChecksumAddress(SCATTER_CONTRACT)).call()
         if int(allowance) > sum(self.amounts_list):
@@ -258,7 +263,7 @@ class TrezorScatter:
             data=data,
             chain_id=2020
         )
-        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
+        transaction = rlp.encode((nonce, self.w3.toWei(1, "gwei"), 1000000, to, 0, data) + sig)
         self.w3.eth.send_raw_transaction(transaction)
         approve_hash = self.w3.toHex(self.w3.keccak(transaction))
         approved = self.w3.eth.wait_for_transaction_receipt(approve_hash, timeout=240)
@@ -308,14 +313,14 @@ class TrezorScatter:
             self.client,
             n=self.bip_path,
             nonce=nonce,
-            gas_price=self.gwei,
-            gas_limit=self.gas,
+            gas_price=self.w3.toWei(str(gas_price), "gwei"),
+            gas_limit=1000000,
             to=SCATTER_CONTRACT,
             value=0,
             data=data,
             chain_id=2020
         )
-        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
+        transaction = rlp.encode((nonce, self.w3.toWei(str(gas_price), "gwei"), 1000000, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         _hash = self.w3.toHex(self.w3.keccak(transaction))
@@ -350,7 +355,7 @@ class TrezorScatter:
     
     def execute_ron(self, gas_price=1, nonce=None):
         # Check enough balance is present
-        if check_balance(self.from_acc, 'ron') >= sum(self.amounts_list) + 0.011:
+        if not check_balance(self.from_acc, 'ron') >= sum(self.amounts_list) + 0.011:
             logging.warning("Not enough RON balance to scatter and pay the tx.")
             return
                 
@@ -373,14 +378,14 @@ class TrezorScatter:
             self.client,
             n=self.bip_path,
             nonce=nonce,
-            gas_price=self.gwei,
-            gas_limit=self.gas,
+            gas_price=self.w3.toWei(str(gas_price), "gwei"),
+            gas_limit=1000000,
             to=SCATTER_CONTRACT,
             value=0,
             data=data,
             chain_id=2020
         )
-        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
+        transaction = rlp.encode((nonce, self.w3.toWei(str(gas_price), "gwei"), 1000000, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         _hash = self.w3.toHex(self.w3.keccak(transaction))
@@ -411,3 +416,8 @@ class TrezorScatter:
         else:
             logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
+
+    def execute(self, gas_price=1, nonce=None):
+        if self.token == 'ron':
+            return self.execute_ron(gas_price, nonce)
+        return self.execute_token(gas_price, nonce)

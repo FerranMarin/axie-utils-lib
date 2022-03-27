@@ -95,7 +95,7 @@ SCATTER_ABI = [{
         'constant': False,
         'inputs': [
             {'name': 'token', 'type':'address'},
-            {'name': 'recipients', type: 'address[]'},
+            {'name': 'recipients', 'type': 'address[]'},
             {'name': 'values', 'type': 'uint256[]'}],
         'name': 'disperseTokenSimple',
         'outputs': [],

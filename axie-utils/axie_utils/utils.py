@@ -48,7 +48,7 @@ def check_balance(account, token='slp'):
     if token.lower() in TOKENS:
         contract = TOKENS[token.lower()]
     elif token.lower() == "ron":
-        return w3.eth.get_balance(Web3.toChecksumAddress(account.replace("ronin:", "0x")))
+        return float(w3.eth.get_balance(Web3.toChecksumAddress(account.replace("ronin:", "0x"))) / 1000000000000000000)
     else:
         return 0
     ctr = w3.eth.contract(
