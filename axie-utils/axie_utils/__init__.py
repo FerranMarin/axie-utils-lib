@@ -1,4 +1,4 @@
-__version__ = '1.1.3'
+__version__ = '2.0.0'
 __all__ = [
     'Axies',
     'AxieGraphQL',
@@ -26,5 +26,6 @@ from axie_utils.claims import Claim, TrezorClaim
 from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 from axie_utils.morphing import Morph, TrezorMorph
 from axie_utils.payments import Payment, TrezorPayment
+from axie_utils.scatter import Scatter, TrezorScatter
 from axie_utils.transfers import Transfer, TrezorTransfer
 from axie_utils.utils import get_nonce, check_balance, CustomUI, TrezorConfig, get_lastclaim

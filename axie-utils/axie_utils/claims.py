@@ -13,7 +13,7 @@ from axie_utils.utils import (
     check_balance,
     get_nonce,
     SLP_CONTRACT,
-    RONIN_PROVIDER_FREE
+    RONIN_PROVIDER
 )
 from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 
@@ -23,7 +23,7 @@ class Claim(AxieGraphQL):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
@@ -88,7 +88,7 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 492874, 'gasPrice': 0, 'nonce': nonce})
+        ).buildTransaction({'gas': 492874, 'gasPrice': 1, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
@@ -160,7 +160,7 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 492874, 'gasPrice': 0, 'nonce': nonce})
+        ).buildTransaction({'gas': 492874, 'gasPrice': 1, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
@@ -197,7 +197,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": self.user_agent}}))
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
@@ -205,7 +205,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         )
         self.acc_name = acc_name
         self.request = requests.Session()
-        self.gwei = self.w3.toWei('0', 'gwei')
+        self.gwei = self.w3.toWei('1', 'gwei')
         self.gas = 492874
 
     def has_unclaimed_slp(self):
@@ -264,7 +264,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': self.gas, 'gasPrice': 0, 'nonce': nonce})
+        ).buildTransaction({'gas': self.gas, 'gasPrice': 1, 'nonce': nonce})
         data = self.w3.toBytes(hexstr=claim['data'])
         to = self.w3.toBytes(hexstr=SLP_CONTRACT)
         sig = ethereum.sign_tx(

@@ -11,7 +11,7 @@ from axie_utils.abis import SLP_ABI
 from axie_utils.utils import (
     get_nonce,
     SLP_CONTRACT,
-    RONIN_PROVIDER_FREE,
+    RONIN_PROVIDER,
     TIMEOUT_MINS,
     USER_AGENT
 )
@@ -21,7 +21,7 @@ class Payment:
     def __init__(self, name, from_acc, from_private, to_acc, amount):
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -33,60 +33,17 @@ class Payment:
             abi=SLP_ABI
         )
 
-    def send_replacement_tx(self, nonce):
+    def increase_gas_tx(self, nonce):
         # check nonce is still available, do nothing if nonce is not available anymore
         if nonce != get_nonce(self.from_acc):
             return
-        # build replacement tx
-        replacement_tx = self.contract.functions.transfer(
-            Web3.toChecksumAddress(self.from_acc),
-            0
-        ).buildTransaction({
-            "chainId": 2020,
-            "gas": 492874,
-            "gasPrice": self.w3.toWei("0", "gwei"),
-            "nonce": nonce
-        })
-        # Sign Transaction
-        signed = self.w3.eth.account.sign_transaction(
-            replacement_tx,
-            private_key=self.from_private
-        )
-        # Send raw transaction
-        self.w3.eth.send_raw_transaction(signed.rawTransaction)
-        # get transaction hash
-        new_hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
-        # Wait for transaction to finish or timeout
-        start_time = datetime.now()
-        while True:
-            # We will wait for max 5min for this replacement tx to happen
-            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
-                success = False
-                logging.info("Replacement transaction, timed out!")
-                break
-            try:
-                receipt = self.w3.eth.get_transaction_receipt(new_hash)
-                if receipt['status'] == 1:
-                    success = True
-                else:
-                    success = False
-                break
-            except exceptions.TransactionNotFound:
-                sleep(10)
-                logging.info(f"Waiting for replacement tx to finish (Nonce: {nonce})")
+        # Increase gas price to get tx unstuck
+        self.execute(1.01, nonce)
 
-        if success:
-            logging.info(f"Successfuly replaced transaction with nonce: {nonce}")
-            logging.info(f"Trying again to execute transaction {self} in 10 seconds")
-            sleep(10)
-            self.execute()
-        else:
-            logging.info(f"Important: Replacement transaction failed. Means we could not complete tx {self}")
-            logging.info(f"Important: Please fix account ({self.name}) transactions manually before launching again.")
-
-    def execute(self):
+    def execute(self, gas_price=1, nonce=None):
         # Get Nonce
-        nonce = get_nonce(self.from_acc)
+        if nonce is None:
+            nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = self.contract.functions.transfer(
             Web3.toChecksumAddress(self.to_acc),
@@ -94,7 +51,7 @@ class Payment:
         ).buildTransaction({
             "chainId": 2020,
             "gas": 246437,
-            "gasPrice": self.w3.toWei("0", "gwei"),
+            "gasPrice": self.w3.toWei(str(gas_price), "gwei"),
             "nonce": nonce
         })
         # Sign Transaction
@@ -104,8 +61,8 @@ class Payment:
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
-        # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        # get transaction _hash
+        _hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish or timeout
         start_time = datetime.now()
         while True:
@@ -115,7 +72,7 @@ class Payment:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(_hash)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -127,11 +84,12 @@ class Payment:
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
 
         if success:
-            logging.info(f"Transaction {self} completed! Hash: {hash} - "
-                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Transaction {self} completed! _hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to replace it with a 0 value tx and re-try.")
-            self.send_replacement_tx(nonce)
+            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            self.increase_gas_tx(nonce)
 
     def __str__(self):
         return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the amount of {self.amount} SLP"
@@ -141,7 +99,7 @@ class TrezorPayment:
     def __init__(self, name, client, bip_path, from_acc, to_acc, amount):
         self.w3 = Web3(
             Web3.HTTPProvider(
-                RONIN_PROVIDER_FREE,
+                RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -153,71 +111,19 @@ class TrezorPayment:
         )
         self.client = client
         self.bip_path = parse_path(bip_path)
-        self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000
 
-    def send_replacement_tx(self, nonce):
+    def increase_gas_tx(self, nonce):
         # check nonce is still available, do nothing if nonce is not available anymore
         if nonce != get_nonce(self.from_acc):
             return
-        # build replacement tx
-        replace_tx = self.contract.functions.transfer(
-            Web3.toChecksumAddress(self.from_acc),
-            0
-        ).buildTransaction({
-            "chainId": 2020,
-            "gas": self.gas,
-            "gasPrice": self.w3.toWei("0", "gwei"),
-            "nonce": nonce
-        })
-        data = self.w3.toBytes(hexstr=replace_tx['data'])
-        to = self.w3.toBytes(hexstr=SLP_CONTRACT)
-        sig = ethereum.sign_tx(
-            self.client,
-            n=self.bip_path,
-            nonce=nonce,
-            gas_price=self.gwei,
-            gas_limit=self.gas,
-            to=SLP_CONTRACT,
-            value=0,
-            data=data,
-            chain_id=2020
-        )
-        replacement_tx = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
-        # Send raw transaction
-        self.w3.eth.send_raw_transaction(replacement_tx)
-        # get transaction hash
-        new_hash = self.w3.toHex(self.w3.keccak(replacement_tx))
-        # Wait for transaction to finish or timeout
-        start_time = datetime.now()
-        while True:
-            # We will wait for max 5min for this replacement tx to happen
-            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
-                success = False
-                logging.info("Replacement transaction, timed out!")
-                break
-            try:
-                receipt = self.w3.eth.get_transaction_receipt(new_hash)
-                if receipt['status'] == 1:
-                    success = True
-                else:
-                    success = False
-                break
-            except exceptions.TransactionNotFound:
-                sleep(10)
-                logging.info(f"Waiting for replacement tx to finish (Nonce: {nonce})")
+        # Increase gas price to get tx unstuck
+        self.execute(1.01, nonce)
 
-        if success:
-            logging.info(f"Successfuly replaced transaction with nonce: {nonce}")
-            logging.info(f"Trying again to execute transaction {self} in 10 seconds")
-            sleep(10)
-            self.execute()
-        else:
-            logging.info(f"Replacement transaction failed. Means we could not complete tx {self}")
-
-    def execute(self):
+    def execute(self, gas_price=1, nonce=None):
         # Get Nonce
-        nonce = get_nonce(self.from_acc)
+        if nonce is None:
+            nonce = get_nonce(self.from_acc)
         # Build transaction
         send_tx = self.contract.functions.transfer(
             Web3.toChecksumAddress(self.to_acc),
@@ -225,7 +131,7 @@ class TrezorPayment:
         ).buildTransaction({
             "chainId": 2020,
             "gas": self.gas,
-            "gasPrice": self.gwei,
+            "gasPrice": self.w3.toWei(str(gas_price), "gwei"),
             "nonce": nonce
         })
         data = self.w3.toBytes(hexstr=send_tx['data'])
@@ -244,7 +150,7 @@ class TrezorPayment:
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
-        hash = self.w3.toHex(self.w3.keccak(transaction))
+        _hash = self.w3.toHex(self.w3.keccak(transaction))
         # Wait for transaction to finish or timeout
         start_time = datetime.now()
         while True:
@@ -254,7 +160,7 @@ class TrezorPayment:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(_hash)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -266,11 +172,12 @@ class TrezorPayment:
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
 
         if success:
-            logging.info(f"Transaction {self} completed! Hash: {hash} - "
-                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Transaction {self} completed! _hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to replace it with a 0 value tx and re-try.")
-            self.send_replacement_tx(nonce)
+            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            self.increase_gas_tx(nonce)
 
     def __str__(self):
         return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the amount of {self.amount} SLP"
