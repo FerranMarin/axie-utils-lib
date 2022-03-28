@@ -40,7 +40,7 @@ class Scatter:
         self.to_list = []
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
-            self.to_list.append(k)
+            self.to_list.append(k.replace("ronin:", "0x"))
             self.amounts_list.append(v)
    
     def is_contract_accepted(self):
@@ -231,7 +231,7 @@ class TrezorScatter:
         self.to_list = []
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
-            self.to_list.append(k)
+            self.to_list.append(k.replace("ronin:", "0x"))
             self.amounts_list.append(v)
    
     def is_contract_accepted(self):        
