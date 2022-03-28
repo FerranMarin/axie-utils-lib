@@ -15,7 +15,7 @@ def test_scatter_init():
     assert s.token == 'slp'
     assert s.from_acc == '0xfrom_acc'
     assert s.from_private == '0xprivate_key'
-    assert s.to_list == ['ronin:abc1', 'ronin:dce2']
+    assert s.to_list == ['0xabc1', '0xdce2']
     assert s.amounts_list == [1, 10]
 
 def test_scatter_init_ron():
@@ -23,7 +23,7 @@ def test_scatter_init_ron():
     assert s.token == 'ron'
     assert s.from_acc == '0xfrom_acc'
     assert s.from_private == '0xprivate_key'
-    assert s.to_list == ['ronin:abc1', 'ronin:dce2']
+    assert s.to_list == ['0xabc1', '0xdce2']
     assert s.amounts_list == [1, 10]
 
 
@@ -32,7 +32,7 @@ def test_scatter_init_trezor():
     assert s.token == 'slp'
     assert s.from_acc == '0xfrom_acc'
     assert s.client == 'client'
-    assert s.to_list == ['ronin:abc1', 'ronin:dce2']
+    assert s.to_list == ['0xabc1', '0xdce2']
     assert s.amounts_list == [1, 10]
 
 
