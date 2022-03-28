@@ -88,6 +88,6 @@ class TrezorMorph(TrezorAxieGraphQL):
             if response.json().get('data') and response.json()['data'].get('morphAxie'):
                 logging.info(f"Axie {self.axie} in {self.account} correctly morphed!")
             else:
-                logging.info(f"Somethin went wrong morphing axie {self.axie} in {self.account}")
+                logging.info(f"Something went wrong morphing axie {self.axie} in {self.account}")
         else:
             logging.critical(f"Axie {self.axie} in {self.account} is not ready to be morphed!")
