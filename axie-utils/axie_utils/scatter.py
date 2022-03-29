@@ -56,8 +56,6 @@ class Scatter:
             Web3.toChecksumAddress(SCATTER_CONTRACT),
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
-            "from":  Web3.toChecksumAddress(self.from_acc),
-            "to": Web3.toChecksumAddress(TOKEN[self.token]),
             "gas": 1000000,
             "gasPrice": self.w3.toWei(1, "gwei")
         })
@@ -248,8 +246,6 @@ class TrezorScatter:
             Web3.toChecksumAddress(SCATTER_CONTRACT),
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
-            "from":  Web3.toChecksumAddress(self.from_acc),
-            "to": Web3.toChecksumAddress(TOKEN[self.token]),
             "gas": 1000000,
             "gasPrice": self.w3.toWei(1, "gwei")
         })
