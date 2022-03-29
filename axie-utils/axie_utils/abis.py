@@ -80,6 +80,17 @@ SLP_ABI = [{
     'type': 'function',
     }]
 
+BALANCE_ABI = [{
+    'constant': True,
+    'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+    'name': 'balanceOf',
+    'outputs': [{'internalType': 'uint256', 'name': '',
+                'type': 'uint256'}],
+    'payable': False,
+    'stateMutability': 'view',
+    'type': 'function',
+    }]
+
 APPROVE_ABI = [{
         'constant': False,
         'inputs': [
