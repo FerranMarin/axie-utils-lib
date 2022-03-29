@@ -33,7 +33,10 @@ class AxieGraphQL:
             logging.critical(f"Error! Creating random msg! Error: {e}")
             return None
         if 200 <= response.status_code <= 299:
-            return response.json()['data']['createRandomMessage']
+            try:
+                return response.json()['data']['createRandomMessage']
+            except KeyError:
+                return None
         return None
 
     def get_jwt(self):
@@ -97,7 +100,10 @@ class TrezorAxieGraphQL:
             logging.critical(f"Error! Creating random msg! Error: {e}")
             return None
         if 200 <= response.status_code <= 299:
-            return response.json()['data']['createRandomMessage']
+            try:
+                return response.json()['data']['createRandomMessage']
+            except KeyError:
+                return None
         return None
 
     def get_jwt(self):
