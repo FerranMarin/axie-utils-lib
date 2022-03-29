@@ -80,15 +80,26 @@ SLP_ABI = [{
     'type': 'function',
     }]
 
-BALANCE_ABI = [{
-    'constant': True,
-    'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-    'name': 'balanceOf',
-    'outputs': [{'internalType': 'uint256', 'name': '',
-                'type': 'uint256'}],
-    'payable': False,
-    'stateMutability': 'view',
-    'type': 'function',
+APPROVE_ABI = [{
+        'constant': False,
+        'inputs': [
+            {'name': '_spender', 'type':'address'},
+            {'name': '_value', 'type': 'uint256'}],
+        'name': 'approve',
+        'outputs': [],
+        'payable': False,
+        'stateMutability': 'nonpayable',
+        'type': 'function'
+    },{
+        'constant': True,
+        'inputs': [
+            {'name': '_owner', 'type':'address'},
+            {'name': '_spender', 'type': 'address'}],
+        'name': 'allowance',
+        'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
+        'payable': False,
+        'stateMutability': 'view',
+        'type': 'function'
     }]
 
 SCATTER_ABI = [{

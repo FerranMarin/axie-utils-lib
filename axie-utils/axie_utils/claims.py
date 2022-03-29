@@ -2,6 +2,7 @@ import asyncio
 import rlp
 import logging
 from time import sleep
+from datetime import datetime, timedelta, timezone
 
 import requests
 from requests.exceptions import RetryError
@@ -210,7 +211,7 @@ class Claim(AxieGraphQL):
 
 
 class TrezorClaim(TrezorAxieGraphQL):
-    def __init__(self, acc_name, **kwargs):
+    def __init__(self, acc_name, force, **kwargs):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(

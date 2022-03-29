@@ -3,7 +3,7 @@ from mock import patch, call
 from axie_utils import Scatter, TrezorScatter
 from axie_utils.abis import SCATTER_ABI
 from axie_utils.utils import (
-    TOKENS,
+    TOKEN,
     SLP_CONTRACT,
 )
 from tests.utils import MockedAllowed, MockedNotAllowed

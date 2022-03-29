@@ -7,12 +7,12 @@ from trezorlib import ethereum
 from trezorlib.tools import parse_path
 from web3 import Web3, exceptions
 
-from axie_utils.abis import SCATTER_ABI, BALANCE_ABI
+from axie_utils.abis import SCATTER_ABI, APPROVE_ABI
 from axie_utils.utils import (
     get_nonce,
     check_balance,
     SCATTER_CONTRACT,
-    TOKENS,
+    TOKEN,
     RONIN_PROVIDER,
     USER_AGENT,
     TIMEOUT_MINS
@@ -28,8 +28,8 @@ class Scatter:
         self.token = token.lower()
         if self.token != 'ron':
             self.token_contract = self.w3.eth.contract(
-                address=Web3.toChecksumAddress(TOKENS[self.token]),
-                abi=BALANCE_ABI
+                address=Web3.toChecksumAddress(TOKEN[self.token]),
+                abi=APPROVE_ABI
             )
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
@@ -57,7 +57,7 @@ class Scatter:
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
             "from":  Web3.toChecksumAddress(self.from_acc),
-            "to": Web3.toChecksumAddress(TOKENS[self.token]),
+            "to": Web3.toChecksumAddress(TOKEN[self.token]),
             "gas": 1000000,
             "gasPrice": self.w3.toWei(1, "gwei")
         })
@@ -97,7 +97,7 @@ class Scatter:
             nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = self.contract.functions.disperseTokenSimple(
-            TOKENS[self.token],
+            TOKEN[self.token],
             self.to_list,
             self.amounts_list
         ).buildTransaction({
@@ -218,8 +218,8 @@ class TrezorScatter:
         self.token = token.lower()
         if self.token != 'ron':
             self.token_contract = self.w3.eth.contract(
-                address=Web3.toChecksumAddress(TOKENS[self.token]),
-                abi=BALANCE_ABI
+                address=Web3.toChecksumAddress(TOKEN[self.token]),
+                abi=APPROVE_ABI
             )
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.client = client
@@ -249,19 +249,19 @@ class TrezorScatter:
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
             "from":  Web3.toChecksumAddress(self.from_acc),
-            "to": Web3.toChecksumAddress(TOKENS[self.token]),
+            "to": Web3.toChecksumAddress(TOKEN[self.token]),
             "gas": 1000000,
             "gasPrice": self.w3.toWei(1, "gwei")
         })
         data = self.w3.toBytes(hexstr=approve_tx['data'])
-        to = self.w3.toBytes(hexstr=TOKENS[self.token])
+        to = self.w3.toBytes(hexstr=TOKEN[self.token])
         sig = ethereum.sign_tx(
             self.client,
             n=self.bip_path,
             nonce=nonce,
             gas_price=self.w3.toWei(1, "gwei"),
             gas_limit=1000000,
-            to=TOKENS[self.token],
+            to=TOKEN[self.token],
             value=0,
             data=data,
             chain_id=2020
@@ -301,7 +301,7 @@ class TrezorScatter:
             nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = self.contract.functions.disperseTokenSimple(
-            TOKENS[self.token],
+            TOKEN[self.token],
             self.to_list,
             self.amounts_list
         ).buildTransaction({

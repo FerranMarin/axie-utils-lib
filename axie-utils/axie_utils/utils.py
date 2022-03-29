@@ -29,7 +29,7 @@ RETRIES = Retry(
     allowed_methods=frozenset(['GET', 'POST'])
 )
 
-TOKENS = {
+TOKEN = {
     'slp': SLP_CONTRACT,
     'axs': AXS_CONTRACT,
     'axies': AXIE_CONTRACT,
@@ -45,8 +45,8 @@ def check_balance(account, token='slp'):
                 request_kwargs={
                     "headers": {"content-type": "application/json",
                                 "user-agent": USER_AGENT}}))
-    if token.lower() in TOKENS:
-        contract = TOKENS[token.lower()]
+    if token.lower() in TOKEN:
+        contract = TOKEN[token.lower()]
     elif token.lower() == "ron":
         return float(w3.eth.get_balance(Web3.toChecksumAddress(account.replace("ronin:", "0x"))) / 1000000000000000000)
     else:
