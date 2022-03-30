@@ -57,7 +57,8 @@ class Scatter:
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
             "gas": 1000000,
-            "gasPrice": self.w3.toWei(1, "gwei")
+            "gasPrice": self.w3.toWei(1, "gwei"),
+            "nonce": get_nonce(self.from_acc)
         })
         signed_approval = self.w3.eth.account.sign_transaction(
             approve_tx,
@@ -247,7 +248,8 @@ class TrezorScatter:
             115792089237316195423570985008687907853269984665640564039457584007913129639935
         ).buildTransaction({
             "gas": 1000000,
-            "gasPrice": self.w3.toWei(1, "gwei")
+            "gasPrice": self.w3.toWei(1, "gwei"),
+            "nonce": nonce
         })
         data = self.w3.toBytes(hexstr=approve_tx['data'])
         to = self.w3.toBytes(hexstr=TOKEN[self.token])
