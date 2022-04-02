@@ -19,6 +19,12 @@ class CallClassZero:
         return 0
 
 
+class CallOwner:
+
+    def call(*args, **kwargs):
+        return "0xabc123"
+
+
 class MockedAllowed:
 
     class functions:
@@ -31,3 +37,10 @@ class MockedNotAllowed:
     class functions:
         def allowance(self, *args, **kwargs):
             return CallClassZero
+
+
+class MockedOwner:
+
+    class functions:
+        def ownerOf(self, *args, **kwargs):
+            return CallOwner()

@@ -8,7 +8,7 @@ import pytest
 from axie_utils import Axies
 from axie_utils.abis import AXIE_ABI
 from axie_utils.utils import AXIE_CONTRACT, RONIN_PROVIDER, USER_AGENT
-
+from tests.utils import MockedOwner
 
 @freeze_time('2021-01-14 01:10:05')
 @patch("web3.eth.Eth.contract", return_value="contract")
@@ -35,6 +35,19 @@ def test_number_of_axies(mocked_checksum, mocked_contract, mocked_balance_of):
     number = a.number_of_axies()
     assert number == 100
     mocked_balance_of.assert_called_with(a.acc, 'axies')
+    mocked_checksum.assert_called_with(AXIE_CONTRACT)
+    mocked_contract.assert_called_with(address="checksum", abi=AXIE_ABI)
+
+
+@patch("web3.eth.Eth.contract", return_value=MockedOwner)
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+def test_check_axie_owner(mocked_checksum, mocked_contract):
+    a = Axies("ronin:abc123")
+    owner = a.check_axie_owner(123)
+    assert owner == True
+    a = Axies("ronin:abc1234")
+    owner = a.check_axie_owner(123)
+    assert owner == False
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi=AXIE_ABI)
 

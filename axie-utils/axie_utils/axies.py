@@ -25,6 +25,9 @@ class Axies:
     def number_of_axies(self):
         return check_balance(self.acc, 'axies')
 
+    def check_axie_owner(self, axie_id):
+        return self.contract.functions.ownerOf(axie_id).call() == self.acc
+
     def find_axies_to_morph(self):
         axie_list = self.get_axies()
         axies = []

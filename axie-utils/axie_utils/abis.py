@@ -31,6 +31,15 @@ AXIE_ABI = [{
     'payable': False,
     'stateMutability': 'view',
     'type': 'function',
+    },{
+    'constant': True,
+    'inputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
+    'name': 'ownerOf',
+    'outputs': [{'internalType': 'address', 'name': '',
+                'type': 'address'}],
+    'payable': False,
+    'stateMutability': 'view',
+    'type': 'function',
     }, {
     'constant': True,
     'inputs': [{'internalType': 'address', 'name': '_owner',
