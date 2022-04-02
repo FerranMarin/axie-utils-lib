@@ -14,7 +14,8 @@ from axie_utils.utils import (
     check_balance,
     get_nonce,
     SLP_CONTRACT,
-    RONIN_PROVIDER
+    RONIN_PROVIDER,
+    TIMEOUT_MINS
 )
 from axie_utils.graphql import AxieGraphQL, TrezorAxieGraphQL
 
@@ -116,8 +117,14 @@ class Claim(AxieGraphQL):
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
         # Get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
-        # Wait for transaction to finish
+       # Wait for transaction to finish or timeout
+        start_time = datetime.now()
         while True:
+            # We will wait for max 5 minutes for this tx to respond
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
+                success = False
+                logging.info(f"Transaction {self}, timed out!")
+                break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
                 if recepit["status"] == 1:
@@ -188,8 +195,14 @@ class Claim(AxieGraphQL):
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
         # Get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
-        # Wait for transaction to finish
+        # Wait for transaction to finish or timeout
+        start_time = datetime.now()
         while True:
+            # We will wait for max 5 minutes for this tx to respond
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
+                success = False
+                logging.info(f"Transaction {self}, timed out!")
+                break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
                 if recepit["status"] == 1:
@@ -318,8 +331,14 @@ class TrezorClaim(TrezorAxieGraphQL):
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         hash = self.w3.toHex(self.w3.keccak(transaction))
-        # Wait for transaction to finish
+        # Wait for transaction to finish or timeout
+        start_time = datetime.now()
         while True:
+            # We will wait for max 5 minutes for this tx to respond
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
+                success = False
+                logging.info(f"Transaction {self}, timed out!")
+                break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
                 if recepit["status"] == 1:
@@ -400,8 +419,14 @@ class TrezorClaim(TrezorAxieGraphQL):
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         hash = self.w3.toHex(self.w3.keccak(transaction))
-        # Wait for transaction to finish
+        # Wait for transaction to finish or timeout
+        start_time = datetime.now()
         while True:
+            # We will wait for max 5 minutes for this tx to respond
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
+                success = False
+                logging.info(f"Transaction {self}, timed out!")
+                break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
                 if recepit["status"] == 1:

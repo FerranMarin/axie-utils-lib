@@ -80,8 +80,8 @@ class Payment:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! _hash: {_hash} - "
@@ -168,8 +168,8 @@ class TrezorPayment:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! _hash: {_hash} - "

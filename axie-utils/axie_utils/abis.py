@@ -134,8 +134,7 @@ SCATTER_ABI = [{
         'type': 'function'
     }, {
         'constant': False,
-        'inputs': [
-        {'name': 'recipients', 'type': 'address[]'},{'name': 'values', 'type': 'uint256[]'}],
+        'inputs': [{'name': 'recipients', 'type': 'address[]'},{'name': 'values', 'type': 'uint256[]'}],
         'name': 'disperseEther',
         'outputs': [],
         'payable': True,

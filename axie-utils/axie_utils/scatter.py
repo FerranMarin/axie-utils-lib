@@ -96,7 +96,7 @@ class Scatter:
             nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = self.contract.functions.disperseTokenSimple(
-            TOKEN[self.token],
+            Web3.toChecksumAddress(TOKEN[self.token]),
             self.to_list,
             self.amounts_list
         ).buildTransaction({
@@ -131,8 +131,8 @@ class Scatter:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -188,8 +188,8 @@ class Scatter:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -259,7 +259,7 @@ class TrezorScatter:
             nonce=nonce,
             gas_price=self.w3.toWei(1, "gwei"),
             gas_limit=1000000,
-            to=TOKEN[self.token],
+            to=Web3.toChecksumAddress(TOKEN[self.token]),
             value=0,
             data=data,
             chain_id=2020
@@ -299,7 +299,7 @@ class TrezorScatter:
             nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = self.contract.functions.disperseTokenSimple(
-            TOKEN[self.token],
+            Web3.toChecksumAddress(TOKEN[self.token]),
             self.to_list,
             self.amounts_list
         ).buildTransaction({
@@ -342,8 +342,8 @@ class TrezorScatter:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -407,8 +407,8 @@ class TrezorScatter:
                 break
             except exceptions.TransactionNotFound:
                 # Sleep 10s while waiting
-                sleep(10)
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
+                sleep(10)
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
