@@ -222,6 +222,8 @@ class Claim(AxieGraphQL):
             logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
 
+    def __str__(self):
+        return f"SLP claim for account {self.account.replace('0x', 'ronin:')}"
 
 class TrezorClaim(TrezorAxieGraphQL):
     def __init__(self, acc_name, force, **kwargs):
@@ -447,3 +449,6 @@ class TrezorClaim(TrezorAxieGraphQL):
             logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
         return
+
+    def __str__(self):
+        return f"SLP claim for account {self.account.replace('0x', 'ronin:')}"
