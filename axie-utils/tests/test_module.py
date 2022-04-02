@@ -2,7 +2,7 @@ import axie_utils
 
 
 def test_version():
-    assert axie_utils.__version__ == '2.0.6'
+    assert axie_utils.__version__ == '2.0.7'
 
 
 def test_init():
