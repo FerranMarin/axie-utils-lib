@@ -1,11 +1,7 @@
-from mock import patch, call
+from web3 import Web3
+from mock import patch
 
 from axie_utils import Scatter, TrezorScatter
-from axie_utils.abis import SCATTER_ABI
-from axie_utils.utils import (
-    TOKEN,
-    SLP_CONTRACT,
-)
 from tests.utils import MockedAllowed, MockedNotAllowed
     
 
@@ -24,7 +20,7 @@ def test_scatter_init_ron():
     assert s.from_acc == '0xfrom_acc'
     assert s.from_private == '0xprivate_key'
     assert s.to_list == ['0xabc1', '0xdce2']
-    assert s.amounts_list == [1, 10]
+    assert s.amounts_list == [Web3.toWei(1, 'ether'), Web3.toWei(10, 'ether')]
 
 
 def test_scatter_init_trezor():
@@ -36,14 +32,14 @@ def test_scatter_init_trezor():
     assert s.amounts_list == [1, 10]
 
 
-@patch("web3.eth.Eth.contract", return_value = MockedAllowed)
+@patch("axie_utils.scatter.get_nonce")
+@patch("web3.eth.Eth.contract", return_value=MockedAllowed)
 @patch("web3.Web3.toChecksumAddress")
-def test_is_contract_accepted_success(mocked_checkssum, mocked_approve):
+def test_is_contract_accepted_success(mocked_checkssum, mocked_approve, _):
     s = Scatter('slp', 'ronin:from_acc', '0xprivate_key', {'ronin:abc1': 1, 'ronin:dce2': 10})
     mocked_checkssum.assert_called()
-    mocked_approve.assert_called()
     assert s.is_contract_accepted() == True
-
+    mocked_approve.assert_called()
 
 
 @patch("axie_utils.scatter.Scatter.approve_contract", return_value='FOO')
@@ -142,7 +138,7 @@ def test_execute_token(*args):
     assert resp == 'transaction_hash'
 
 
-@patch("axie_utils.scatter.check_balance", return_value=100000)
+@patch("axie_utils.scatter.check_balance", return_value=1000)
 @patch("axie_utils.scatter.TrezorScatter.is_contract_accepted", return_value=True)
 @patch("axie_utils.payments.rlp.encode")
 @patch("web3.Web3.toBytes")
@@ -160,7 +156,7 @@ def test_execute_token_trezor(*args):
     assert resp == 'transaction_hash'
 
 
-@patch("axie_utils.scatter.check_balance", return_value=100000)
+@patch("axie_utils.scatter.check_balance", return_value=1000)
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.account.sign_transaction")
@@ -175,7 +171,7 @@ def test_execute_ron(*args):
     assert resp == 'transaction_hash'
 
 
-@patch("axie_utils.scatter.check_balance", return_value=100000)
+@patch("axie_utils.scatter.check_balance", return_value=1000)
 @patch("axie_utils.payments.rlp.encode")
 @patch("web3.Web3.toBytes")
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)

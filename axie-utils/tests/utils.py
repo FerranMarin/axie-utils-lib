@@ -25,12 +25,20 @@ class CallOwner:
         return "0xabc123"
 
 
+class MockBuild:
+
+    def buildTransaction(self, *args, **kwargs):
+        return None
+
+
 class MockedAllowed:
 
     class functions:
         def allowance(self, *args, **kwargs):
             return CallClass
 
+        def approve(self, *args, **kwargs):
+            return MockBuild()
 
 class MockedNotAllowed:
 

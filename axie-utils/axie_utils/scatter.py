@@ -41,7 +41,10 @@ class Scatter:
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
             self.to_list.append(k.replace("ronin:", "0x"))
-            self.amounts_list.append(v)
+            if self.token == 'ron':
+                self.amounts_list.append(self.w3.toWei(v,'ether'))
+            else:
+                self.amounts_list.append(v)
    
     def is_contract_accepted(self):
         allowance = self.token_contract.functions.allowance(
@@ -87,7 +90,7 @@ class Scatter:
             return
 
         # Check enough balance is present
-        if not check_balance(self.from_acc, self.token) >= sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= 0.011:
+        if not check_balance(self.from_acc, self.token) >= sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= self.w3.toWei(0.00001, 'ether'):
             logging.warning("Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
             return
         
@@ -145,7 +148,7 @@ class Scatter:
     
     def execute_ron(self, gas_price=1, nonce=None):
         # Check enough balance is present
-        if not check_balance(self.from_acc, 'ron') >= (sum(self.amounts_list) + 0.011):
+        if not self.w3.toWei(check_balance(self.from_acc, 'ron'), 'ether') >= (sum(self.amounts_list) + self.w3.toWei(0.00001, 'ether')):
             logging.warning("Not enough RON balance to scatter and pay the tx.")
             return
                 
@@ -231,7 +234,10 @@ class TrezorScatter:
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
             self.to_list.append(k.replace("ronin:", "0x"))
-            self.amounts_list.append(v)
+            if self.token == 'ron':
+                self.amounts_list.append(self.w3.toWei(v,'ether'))
+            else:
+                self.amounts_list.append(v)
    
     def is_contract_accepted(self):        
         allowance = self.token_contract.functions.allowance(
@@ -290,7 +296,7 @@ class TrezorScatter:
             return
 
         # Check enough balance is present
-        if not check_balance(self.from_acc, self.token) >= sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= 0.011:
+        if not check_balance(self.from_acc, self.token) >= (sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= self.w3.toWei(0.00001, 'ether')):
             logging.warning("Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
             return
         
@@ -356,10 +362,10 @@ class TrezorScatter:
     
     def execute_ron(self, gas_price=1, nonce=None):
         # Check enough balance is present
-        if not check_balance(self.from_acc, 'ron') >= sum(self.amounts_list) + 0.011:
+        if not self.w3.toWei(check_balance(self.from_acc, 'ron'), 'ether') >= (sum(self.amounts_list) + self.w3.toWei(0.00001, 'ether')):
             logging.warning("Not enough RON balance to scatter and pay the tx.")
             return
-                
+
         # Get Nonce
         if nonce is None:
             nonce = get_nonce(self.from_acc)

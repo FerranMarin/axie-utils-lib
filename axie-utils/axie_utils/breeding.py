@@ -98,7 +98,6 @@ class TrezorBreed:
         self.address = address.replace("ronin:", "0x")
         self.client = client
         self.bip_path = parse_path(bip_path)
-        self.gwei = self.w3.toWei('1', 'gwei')
         self.gas = 250000
 
     def execute(self):
@@ -116,7 +115,7 @@ class TrezorBreed:
         ).buildTransaction({
             "chainId": 2020,
             "gas": self.gas,
-            "gasPrice": self.gwei,
+            "gasPrice": self.w3.toWei('1', 'gwei'),
             "nonce": nonce
         })
         data = self.w3.toBytes(hexstr=breed_tx['data'])
@@ -125,14 +124,14 @@ class TrezorBreed:
             self.client,
             n=self.bip_path,
             nonce=nonce,
-            gas_price=self.gwei,
+            gas_price=self.w3.toWei('1', 'gwei'),
             gas_limit=self.gas,
             to=AXIE_CONTRACT,
             value=0,
             data=data,
             chain_id=2020
         )
-        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
+        transaction = rlp.encode((nonce, self.w3.toWei('1', 'gwei'), self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
         # get transaction _hash

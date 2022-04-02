@@ -107,7 +107,7 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 492874, 'gasPrice': 1, 'nonce': nonce})
+        ).buildTransaction({'gas': 492874, 'gasPrice': self.w3.toWei('1', 'gwei'), 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
@@ -185,7 +185,7 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 492874, 'gasPrice': 1, 'nonce': nonce})
+        ).buildTransaction({'gas': 492874, 'gasPrice': self.w3.toWei('1', 'gwei'), 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
@@ -313,7 +313,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': self.gas, 'gasPrice': 1, 'nonce': nonce})
+        ).buildTransaction({'gas': self.gas, 'gasPrice': self.w3.toWei('1', 'gwei'), 'nonce': nonce})
         data = self.w3.toBytes(hexstr=claim['data'])
         to = self.w3.toBytes(hexstr=SLP_CONTRACT)
         sig = ethereum.sign_tx(
@@ -401,7 +401,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': self.gas, 'gasPrice': 0, 'nonce': nonce})
+        ).buildTransaction({'gas': self.gas, 'gasPrice': self.w3.toWei('1', 'gwei'), 'nonce': nonce})
         data = self.w3.toBytes(hexstr=claim['data'])
         to = self.w3.toBytes(hexstr=SLP_CONTRACT)
         sig = ethereum.sign_tx(
