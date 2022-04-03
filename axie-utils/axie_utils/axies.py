@@ -15,7 +15,7 @@ class Axies:
             Web3.HTTPProvider(
                 RONIN_PROVIDER,
                 request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
-        self.acc = account.replace("ronin:", "0x")
+        self.acc = account.replace("ronin:", "0x").lower()
         self.contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
             abi=AXIE_ABI
