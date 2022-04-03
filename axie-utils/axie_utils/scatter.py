@@ -40,7 +40,7 @@ class Scatter:
         self.to_list = []
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
-            self.to_list.append(k.replace("ronin:", "0x"))
+            self.to_list.append(Web3.toChecksumAddress(k.replace("ronin:", "0x")))
             if self.token == 'ron':
                 self.amounts_list.append(self.w3.toWei(v,'ether'))
             else:
@@ -233,7 +233,7 @@ class TrezorScatter:
         self.to_list = []
         self.amounts_list = []
         for k,v in to_ronin_ammount_dict.items():
-            self.to_list.append(k.replace("ronin:", "0x"))
+            self.to_list.append(Web3.toChecksumAddress(k.replace("ronin:", "0x")))
             if self.token == 'ron':
                 self.amounts_list.append(self.w3.toWei(v,'ether'))
             else:
