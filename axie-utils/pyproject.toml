@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "axie-utils"
-version = "2.0.9"
+version = "2.0.10"
 description = "Library that provides the functionality you need to build your own axie Infinity python tools"
 authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
 license = "GNU LGPLv3"
