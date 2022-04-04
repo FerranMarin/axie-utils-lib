@@ -26,7 +26,8 @@ class Axies:
         return check_balance(self.acc, 'axies')
 
     def check_axie_owner(self, axie_id):
-        return Web3.toChecksumAddress(self.contract.functions.ownerOf(axie_id).call()) == Web3.toChecksumAddress(self.acc)
+        logging.debug(f'Owner: {self.contract.functions.ownerOf(axie_id).call().lower()}, "checker": {self.acc}')
+        return self.contract.functions.ownerOf(axie_id).call().lower() ==self.acc
 
     def find_axies_to_morph(self):
         axie_list = self.get_axies()
