@@ -165,6 +165,7 @@ class Scatter:
             "gasPrice": self.w3.toWei(str(gas_price), "gwei"),
             "nonce": nonce
         })
+        logging.debug(f'DEBUG: {transaction}. \n to_list: {self.to_list}   \n amounts_list: {self.amounts_list}')
         # Sign Transaction
         signed = self.w3.eth.account.sign_transaction(
             transaction,
