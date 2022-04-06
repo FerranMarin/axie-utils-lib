@@ -48,7 +48,7 @@ def test_execute_transfer(mock_transaction_receipt,
 @patch("web3.Web3.toBytes")
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch("axie_utils.transfers.ethereum.sign_tx")
+@patch("axie_utils.transfers.ethereum.sign_tx", return_value=(b'a', b'b', b'c'))
 @patch("web3.eth.Eth.send_raw_transaction")
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')

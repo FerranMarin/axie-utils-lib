@@ -68,7 +68,7 @@ def test_trezorbreed_init(mock_parse):
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
 @patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
-@patch('axie_utils.breeding.ethereum.sign_tx')
+@patch('axie_utils.breeding.ethereum.sign_tx', return_value=(b'a', b'b', b'c'))
 @patch("axie_utils.breeding.get_nonce", return_value=1)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
