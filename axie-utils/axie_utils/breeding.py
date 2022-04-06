@@ -131,6 +131,10 @@ class TrezorBreed:
             data=data,
             chain_id=2020
         )
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.w3.toWei('1', 'gwei'), self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)

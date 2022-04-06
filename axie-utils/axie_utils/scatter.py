@@ -194,6 +194,14 @@ class Scatter:
                 # Sleep 10s while waiting
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -271,6 +279,10 @@ class TrezorScatter:
             data=data,
             chain_id=2020
         )
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.w3.toWei(1, "gwei"), 1000000, to, 0, data) + sig)
         self.w3.eth.send_raw_transaction(transaction)
         approve_hash = self.w3.toHex(self.w3.keccak(transaction))
@@ -328,6 +340,10 @@ class TrezorScatter:
             data=data,
             chain_id=2020
         )
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.w3.toWei(str(gas_price), "gwei"), 1000000, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
@@ -351,6 +367,14 @@ class TrezorScatter:
                 # Sleep 10s while waiting
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -393,6 +417,10 @@ class TrezorScatter:
             data=data,
             chain_id=2020
         )
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.w3.toWei(str(gas_price), "gwei"), 1000000, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
