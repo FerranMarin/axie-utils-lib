@@ -136,6 +136,14 @@ class Scatter:
                 # Sleep 10s while waiting
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "
@@ -444,6 +452,14 @@ class TrezorScatter:
                 # Sleep 10s while waiting
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"Transaction {self} completed! hash: {_hash} - "

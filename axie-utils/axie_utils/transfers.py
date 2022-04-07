@@ -77,6 +77,14 @@ class Transfer:
                 logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{nonce})...")
                 # Sleep 10 seconds not to constantly send requests!
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
         if success:
             logging.info(f"{self} completed! Hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
@@ -165,6 +173,14 @@ class TrezorTransfer:
                 logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{nonce})...")
                 # Sleep 10 seconds not to constantly send requests!
                 sleep(10)
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
         if success:
             logging.info(f"{self} completed! Hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")

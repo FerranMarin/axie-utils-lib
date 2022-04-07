@@ -75,6 +75,14 @@ class Breed:
                 # Sleep 10s while waiting
                 sleep(10)
                 logging.info(f"Waiting for transactions '{self}' to finish (Nonce: {nonce})...")
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"{self} completed successfully")
@@ -160,6 +168,14 @@ class TrezorBreed:
                 # Sleep 10s while waiting
                 sleep(10)
                 logging.info(f"Waiting for transactions '{self}' to finish (Nonce: {nonce})...")
+            except ValueError as err:
+                if 'receipts not found by' in err.args[0]['message']:
+                    logging.info("Could not find TX, giving it a bit more time.")
+                    sleep(20)
+                else:
+                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    "Error given: {err}.")
+                    return
 
         if success:
             logging.info(f"{self} completed successfully")
