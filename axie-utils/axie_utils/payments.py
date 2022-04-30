@@ -69,7 +69,7 @@ class Payment:
             # We will wait for max 5minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -87,16 +87,16 @@ class Payment:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! _hash: {_hash} - "
+            logging.info(f"Important: Transaction {self} completed! _hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
 
     def __str__(self):
@@ -169,7 +169,7 @@ class TrezorPayment:
             # We will wait for max 5 minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -187,16 +187,16 @@ class TrezorPayment:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! _hash: {_hash} - "
+            logging.info(f"Important: Transaction {self} completed! _hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
 
     def __str__(self):

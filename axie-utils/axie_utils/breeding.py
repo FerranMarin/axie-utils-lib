@@ -80,15 +80,15 @@ class Breed:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"{self} completed successfully")
+            logging.info(f"Important: {self} completed successfully")
             return _hash
         else:
-            logging.info(f"{self} failed")
+            logging.info(f"Important: {self} failed")
 
     def __str__(self):
         return (f"Breeding axie {self.sire_axie} with {self.matron_axie} in account "
@@ -149,7 +149,7 @@ class TrezorBreed:
         # get transaction _hash
         _hash = self.w3.toHex(self.w3.keccak(transaction))
         # Wait for transaction to finish or timeout
-        logging.info("{self} about to start!")
+        logging.info(f"{self} about to start!")
         start_time = datetime.now()
         while True:
             # We will wait for max 10minutes for this tx to respond
@@ -173,15 +173,15 @@ class TrezorBreed:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"{self} completed successfully")
+            logging.info(f"Important: {self} completed successfully")
             return _hash
         else:
-            logging.info(f"{self} failed")
+            logging.info(f"Important: {self} failed")
             return
 
     def __str__(self):

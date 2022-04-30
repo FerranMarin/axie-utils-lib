@@ -91,7 +91,7 @@ class Scatter:
 
         # Check enough balance is present
         if not check_balance(self.from_acc, self.token) >= sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= self.w3.toWei(0.00001, 'ether'):
-            logging.warning("Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
+            logging.warning(f"Important: Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
             return
         
         # Get Nonce
@@ -123,7 +123,7 @@ class Scatter:
             # We will wait for max 5minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important:Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -141,23 +141,23 @@ class Scatter:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! hash: {_hash} - "
-                        f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            logging.info(f"Important: Transaction {self} completed! hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
     
     
     def execute_ron(self, gas_price=1, nonce=None):
         # Check enough balance is present
         if not self.w3.toWei(check_balance(self.from_acc, 'ron'), 'ether') >= (sum(self.amounts_list) + self.w3.toWei(0.00001, 'ether')):
-            logging.warning("Not enough RON balance to scatter and pay the tx.")
+            logging.warning("Important: Not enough RON balance to scatter and pay the tx.")
             return
                 
         # Get Nonce
@@ -171,7 +171,8 @@ class Scatter:
             "chainId": 2020,
             "gas": 1000000,
             "gasPrice": self.w3.toWei(str(gas_price), "gwei"),
-            "nonce": nonce
+            "nonce": nonce,
+            "value": sum(self.amounts_list)
         })
         logging.debug(f'DEBUG: {transaction}. \n to_list: {self.to_list}   \n amounts_list: {self.amounts_list}')
         # Sign Transaction
@@ -189,7 +190,7 @@ class Scatter:
             # We will wait for max 5minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -207,16 +208,16 @@ class Scatter:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! hash: {_hash} - "
-                        f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            logging.info(f"Important: Transaction {self} completed! hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
 
     def execute(self, gas_price=1, nonce=None):
@@ -311,14 +312,14 @@ class TrezorScatter:
     def execute_token(self, gas_price=1, nonce=None):
         # Check token is approved
         if not self.is_contract_accepted():
-            logging.warning(f"Token {self.token} is not approved to use scatter, "
+            logging.warning(f"Important: Token {self.token} is not approved to use scatter, "
                             "you can re-try or manually accept it on "
                             "scatter website (https://scatter.roninchain.com/).")
             return
 
         # Check enough balance is present
         if not check_balance(self.from_acc, self.token) >= (sum(self.amounts_list) and check_balance(self.from_acc, 'ron') >= self.w3.toWei(0.00001, 'ether')):
-            logging.warning("Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
+            logging.warning(f"Important: Not enough {TOKEN[self.token]} balance or not enough RON to pay for the tx")
             return
         
         # Get Nonce
@@ -362,7 +363,7 @@ class TrezorScatter:
             # We will wait for max 5minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -380,16 +381,16 @@ class TrezorScatter:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! hash: {_hash} - "
-                        f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            logging.info(f"Important: Transaction {self} completed! hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
     
     
@@ -410,7 +411,8 @@ class TrezorScatter:
             "chainId": 2020,
             "gas": 1000000,
             "gasPrice": self.w3.toWei(str(gas_price), "gwei"),
-            "nonce": nonce
+            "nonce": nonce,
+            "value": sum(self.amounts_list)
         })
         data = self.w3.toBytes(hexstr=transaction['data'])
         to = self.w3.toBytes(hexstr=SCATTER_CONTRACT)
@@ -421,7 +423,7 @@ class TrezorScatter:
             gas_price=self.w3.toWei(str(gas_price), "gwei"),
             gas_limit=1000000,
             to=SCATTER_CONTRACT,
-            value=0,
+            value=sum(self.amounts_list),
             data=data,
             chain_id=2020
         )
@@ -439,7 +441,7 @@ class TrezorScatter:
             # We will wait for max 5minutes for this tx to respond, if it does not, we will re-try
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -457,16 +459,16 @@ class TrezorScatter:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
 
         if success:
-            logging.info(f"Transaction {self} completed! hash: {_hash} - "
-                        f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
+            logging.info(f"Important: Transaction {self} completed! hash: {_hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"Transaction {self} failed. Trying to augment gas price to unstuck it.")
+            logging.info(f"Important: Transaction {self} failed. Trying to augment gas price to unstuck it.")
             self.increase_gas_tx(nonce)
 
     def execute(self, gas_price=1, nonce=None):

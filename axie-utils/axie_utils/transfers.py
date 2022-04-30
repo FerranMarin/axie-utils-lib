@@ -82,15 +82,15 @@ class Transfer:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
+                    logging.warning("Important: Error occurred trying to find recepit for transaction '{self}'.\n"
                                     "Error given: {err}.")
                     return
         if success:
-            logging.info(f"{self} completed! Hash: {_hash} - "
+            logging.info(f"Important: {self} completed! Hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"{self} failed")
+            logging.info(f"Important: {self} failed")
             return
 
     def __str__(self):
@@ -160,7 +160,7 @@ class TrezorTransfer:
             # We will wait for max 5min for this trasnfer to happen
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transfer {self}, timed out!")
+                logging.info(f"Important: Transfer {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(_hash)
@@ -178,15 +178,15 @@ class TrezorTransfer:
                     logging.info("Could not find TX, giving it a bit more time.")
                     sleep(20)
                 else:
-                    logging.warning("Error occurred trying to find recepit for transaction '{self}'.\n"
-                                    "Error given: {err}.")
+                    logging.warning(f"Important: Error occurred trying to find recepit for transaction '{self}'.\n"
+                                    f"Error given: {err}.")
                     return
         if success:
-            logging.info(f"{self} completed! Hash: {_hash} - "
+            logging.info(f"Important: {self} completed! Hash: {_hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(_hash)}")
             return _hash
         else:
-            logging.info(f"{self} failed")
+            logging.info(f"Important: {self} failed")
             return
 
     def __str__(self):

@@ -38,18 +38,18 @@ class Morph(AxieGraphQL):
         try:
             response = self.request.post(url, headers=headers, json=payload)
         except RetryError:
-            logging.critical(f"Important! Axie {self.axie} in {self.account} is not ready to be morphed!")
+            logging.critical(f"Important: Axie {self.axie} in {self.account} is not ready to be morphed!")
             return
 
         if 200 <= response.status_code <= 299:
             if response.json().get('data') and response.json()['data'].get('morphAxie'):
-                logging.info(f"Axie {self.axie} in {self.account} correctly morphed!")
+                logging.info(f"Important: Axie {self.axie} in {self.account} correctly morphed!")
                 return
             else:
-                logging.info(f"Something went wrong morphing axie {self.axie} in {self.account}")
+                logging.info(f"Important: Something went wrong morphing axie {self.axie} in {self.account}")
                 return
         else:
-            logging.critical(f"Axie {self.axie} in {self.account} is not ready to be morphed!")
+            logging.critical(f"Important: Axie {self.axie} in {self.account} is not ready to be morphed!")
         return
 
 
@@ -86,8 +86,8 @@ class TrezorMorph(TrezorAxieGraphQL):
 
         if 200 <= response.status_code <= 299:
             if response.json().get('data') and response.json()['data'].get('morphAxie'):
-                logging.info(f"Axie {self.axie} in {self.account} correctly morphed!")
+                logging.info(f"Important: Axie {self.axie} in {self.account} correctly morphed!")
             else:
-                logging.info(f"Something went wrong morphing axie {self.axie} in {self.account}")
+                logging.info(f"Important: Something went wrong morphing axie {self.axie} in {self.account}")
         else:
-            logging.critical(f"Axie {self.axie} in {self.account} is not ready to be morphed!")
+            logging.critical(f"Important: Axie {self.axie} in {self.account} is not ready to be morphed!")

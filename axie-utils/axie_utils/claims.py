@@ -47,7 +47,7 @@ class Claim(AxieGraphQL):
         try:
             response = self.request.get(url, headers={"User-Agent": self.user_agent})
         except RetryError:
-            logging.critical(f"Failed to check if there is unclaimed SLP for acc {self.acc_name} "
+            logging.critical(f"Important: Failed to check if there is unclaimed SLP for acc {self.acc_name} "
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
@@ -56,7 +56,7 @@ class Claim(AxieGraphQL):
             next_claim_date = last_claimed + timedelta(days=14)
             utcnow = datetime.utcnow()
             if utcnow < next_claim_date and not self.force:
-                logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                logging.critical(f"Important: This account will be claimable again on {self.humanize_date(next_claim_date)}.")
                 return None
             elif self.force:
                 logging.info('Skipping check of dates, --force option was selected')
@@ -76,7 +76,7 @@ class Claim(AxieGraphQL):
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical("Skipping claiming, we could not get the JWT for account "
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
                              f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
@@ -87,17 +87,17 @@ class Claim(AxieGraphQL):
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
-            logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
+            logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
-                logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
                                  "in blockchain_related")
                 return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "had to be skipped")
             return
         nonce = get_nonce(self.account)
@@ -123,7 +123,7 @@ class Claim(AxieGraphQL):
             # We will wait for max 5 minutes for this tx to respond
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
@@ -138,10 +138,10 @@ class Claim(AxieGraphQL):
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-            logging.info(f"SLP Claimed! New balance for account {self.acc_name} "
+            logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
                          f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
 
     def execute(self):
@@ -154,7 +154,7 @@ class Claim(AxieGraphQL):
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical("Skipping claiming, we could not get the JWT for account "
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
                              f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
@@ -165,17 +165,17 @@ class Claim(AxieGraphQL):
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
-            logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
+            logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
-                logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
                                  "in blockchain_related")
                 return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "had to be skipped")
             return
         nonce = get_nonce(self.account)
@@ -201,7 +201,7 @@ class Claim(AxieGraphQL):
             # We will wait for max 5 minutes for this tx to respond
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
@@ -216,10 +216,10 @@ class Claim(AxieGraphQL):
                 # Sleep 5 seconds not to constantly send requests!
                 sleep(5)
         if success:
-            logging.info(f"SLP Claimed! New balance for account {self.acc_name} "
+            logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
                          f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
 
     def __str__(self):
@@ -255,7 +255,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         try:
             response = self.request.get(url, headers={"User-Agent": self.user_agent})
         except RetryError:
-            logging.critical(f"Failed to check if there is unclaimed SLP for acc {self.acc_name} "
+            logging.critical(f"Important: Failed to check if there is unclaimed SLP for acc {self.acc_name} "
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
@@ -264,10 +264,10 @@ class TrezorClaim(TrezorAxieGraphQL):
             next_claim_date = last_claimed + timedelta(days=14)
             utcnow = datetime.utcnow()
             if utcnow < next_claim_date and not self.force:
-                logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                logging.critical(f"Important: This account will be claimable again on {self.humanize_date(next_claim_date)}.")
                 return None
             elif self.force:
-                logging.info('Skipping check of dates, --force option was selected')
+                logging.info('Important: Skipping check of dates, --force option was selected')
             wallet_total = check_balance(self.account)
             in_game_total = int(data['total'])
             if in_game_total > wallet_total:
@@ -277,14 +277,14 @@ class TrezorClaim(TrezorAxieGraphQL):
     async def async_execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.info(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "has no claimable SLP")
             return
-        logging.info(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) has "
+        logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) has "
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical("Skipping claiming, we could not get the JWT for account "
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
                              f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
@@ -295,17 +295,17 @@ class TrezorClaim(TrezorAxieGraphQL):
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
-            logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
+            logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
-                logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
                                  "in blockchain_related")
                 return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "had to be skipped")
             return
         nonce = get_nonce(self.account)
@@ -343,7 +343,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             # We will wait for max 5 minutes for this tx to respond
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
@@ -358,25 +358,25 @@ class TrezorClaim(TrezorAxieGraphQL):
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-            logging.info(f"SLP Claimed! New balance for account {self.acc_name} "
+            logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
                          f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
             return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
         return
 
     def execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.info(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "has no claimable SLP")
             return
-        logging.info(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) has "
+        logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) has "
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical("Skipping claiming, we could not get the JWT for account "
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
                              f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
@@ -387,17 +387,17 @@ class TrezorClaim(TrezorAxieGraphQL):
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
-            logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
+            logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
-                logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
                                  "in blockchain_related")
                 return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "had to be skipped")
             return
         nonce = get_nonce(self.account)
@@ -435,7 +435,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             # We will wait for max 5 minutes for this tx to respond
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
-                logging.info(f"Transaction {self}, timed out!")
+                logging.info(f"Important: Transaction {self}, timed out!")
                 break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
@@ -450,11 +450,11 @@ class TrezorClaim(TrezorAxieGraphQL):
                 # Sleep 5 seconds not to constantly send requests!
                 sleep(5)
         if success:
-            logging.info(f"SLP Claimed! New balance for account {self.acc_name} "
+            logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
                          f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
             return
         else:
-            logging.info(f"Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
         return
 
