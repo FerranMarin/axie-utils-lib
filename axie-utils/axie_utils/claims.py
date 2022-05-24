@@ -41,29 +41,29 @@ class Claim(AxieGraphQL):
     def humanize_date(self, date):
         local_date = self.localize_date(date)
         return local_date.strftime("%m/%d/%Y, %H:%M")
-        
+
     def has_unclaimed_slp(self):
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
+        url = f"http://game-api-pre.skymavis.com/v1/players/{self.account}/items/1"
         try:
             response = self.request.get(url, headers={"User-Agent": self.user_agent})
         except RetryError:
             logging.critical(f"Important: Failed to check if there is unclaimed SLP for acc {self.acc_name} "
-                             f"({self.account.replace('0x','ronin:')})")
+                             f"({self.account.replace('0x', 'ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
             data = response.json()
-            last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
+            last_claimed = datetime.utcfromtimestamp(data['lastClaimedItemAt'])
             next_claim_date = last_claimed + timedelta(days=14)
             utcnow = datetime.utcnow()
             if utcnow < next_claim_date and not self.force:
-                logging.critical(f"Important: This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                logging.critical(
+                    f"Important: This account will be claimable again on {self.humanize_date(next_claim_date)}.")
                 return None
             elif self.force:
-                logging.info('Skipping check of dates, --force option was selected')
-            wallet_total = check_balance(self.account)
-            in_game_total = int(data['total'])
-            if in_game_total > wallet_total:
-                return in_game_total - wallet_total
+                logging.info('Important: Skipping check of dates, --force option was selected')
+            claimable_total = int(data['rawClaimableTotal'])
+            if claimable_total > 0:
+                return claimable_total
         return None
 
     async def async_execute(self):
@@ -83,7 +83,7 @@ class Claim(AxieGraphQL):
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
         }
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
+        url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
@@ -91,10 +91,10 @@ class Claim(AxieGraphQL):
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
-            signature = response.json()["blockchain_related"].get("signature")
+            signature = response.json()["blockchainRelated"].get("signature")
             if not signature or not signature["signature"]:
                 logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                                 "in blockchain_related")
+                                 "in blockchainRelated")
                 return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
@@ -161,7 +161,7 @@ class Claim(AxieGraphQL):
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
         }
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
+        url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
@@ -169,10 +169,10 @@ class Claim(AxieGraphQL):
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
-            signature = response.json()["blockchain_related"].get("signature")
+            signature = response.json()["blockchainRelated"].get("signature")
             if not signature or not signature["signature"]:
                 logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                                 "in blockchain_related")
+                                 "in blockchainRelated")
                 return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
@@ -248,10 +248,9 @@ class TrezorClaim(TrezorAxieGraphQL):
     def humanize_date(self, date):
         local_date = self.localize_date(date)
         return local_date.strftime("%m/%d/%Y, %H:%M")
-        
-        
+
     def has_unclaimed_slp(self):
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
+        url = f"http://game-api-pre.skymavis.com/v1/players/{self.account}/items/1"
         try:
             response = self.request.get(url, headers={"User-Agent": self.user_agent})
         except RetryError:
@@ -260,7 +259,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             return None
         if 200 <= response.status_code <= 299:
             data = response.json()
-            last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
+            last_claimed = datetime.utcfromtimestamp(data['lastClaimedItemAt'])
             next_claim_date = last_claimed + timedelta(days=14)
             utcnow = datetime.utcnow()
             if utcnow < next_claim_date and not self.force:
@@ -268,10 +267,9 @@ class TrezorClaim(TrezorAxieGraphQL):
                 return None
             elif self.force:
                 logging.info('Important: Skipping check of dates, --force option was selected')
-            wallet_total = check_balance(self.account)
-            in_game_total = int(data['total'])
-            if in_game_total > wallet_total:
-                return in_game_total - wallet_total
+            claimable_total = int(data['rawClaimableTotal'])
+            if claimable_total > 0:
+                return claimable_total
         return None
 
     async def async_execute(self):
@@ -291,7 +289,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
         }
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
+        url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
@@ -299,10 +297,10 @@ class TrezorClaim(TrezorAxieGraphQL):
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
-            signature = response.json()["blockchain_related"].get("signature")
+            signature = response.json()["blockchainRelated"].get("signature")
             if not signature or not signature["signature"]:
                 logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                                 "in blockchain_related")
+                                 "in blockchainRelated")
                 return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
@@ -383,7 +381,7 @@ class TrezorClaim(TrezorAxieGraphQL):
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
         }
-        url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
+        url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
@@ -391,10 +389,10 @@ class TrezorClaim(TrezorAxieGraphQL):
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
-            signature = response.json()["blockchain_related"].get("signature")
+            signature = response.json()["blockchainRelated"].get("signature")
             if not signature or not signature["signature"]:
                 logging.critical(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                                 "in blockchain_related")
+                                 "in blockchainRelated")
                 return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "

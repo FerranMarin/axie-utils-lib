@@ -30,7 +30,7 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
     assert c.private_key == "bar"
     assert c.account == "0xfoo"
     assert c.acc_name == "test_acc"
-    assert c.force == False
+    assert c.force is False
 
 
 @patch("web3.eth.Eth.contract")
@@ -50,27 +50,25 @@ def test_claim_init_force(mocked_provider, mocked_checksum, mocked_contract):
     assert c.private_key == "bar"
     assert c.account == "0xfoo"
     assert c.acc_name == "test_acc"
-    assert c.force == True
+    assert c.force is True
 
 
-@patch("axie_utils.claims.check_balance", return_value=10)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
+def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
     last_claimed_date = datetime.utcnow() - timedelta(days=15)
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": last_claimed_date.timestamp(),
-                             "claimable_total": 0})
+                             "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
             c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc", force=False)
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 2
-        mocked_check.assert_called_with("0xfoo")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
@@ -79,17 +77,16 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
         mocked_contract.assert_called()
 
 
-@patch("axie_utils.claims.check_balance", return_value=10)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
+def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_contract):
     last_claimed_date = datetime.utcnow() - timedelta(days=13) + timedelta(minutes=1)
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": last_claimed_date.timestamp(),
-                             "claimable_total": 0})
+                             "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
@@ -101,21 +98,19 @@ def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_cont
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_check.assert_not_called()
         mocked_contract.assert_called()
 
 
-@patch("axie_utils.claims.check_balance", return_value=10)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_date_force(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
+def test_has_unclaimed_date_force(mocked_provider, mocked_checksum, mocked_contract):
     last_claimed_date = datetime.utcnow() - timedelta(days=14) + timedelta(minutes=1)
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": last_claimed_date.timestamp(),
-                             "claimable_total": 0})
+                             "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
@@ -127,7 +122,6 @@ def test_has_unclaimed_date_force(mocked_provider, mocked_checksum, mocked_contr
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_check.assert_called()
         mocked_contract.assert_called()
 
 
@@ -136,7 +130,7 @@ def test_has_unclaimed_date_force(mocked_provider, mocked_checksum, mocked_contr
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract):
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        status_code=500)
         with patch.object(builtins,
                           "open",
@@ -359,9 +353,9 @@ def test_claim_execution(mocked_provider,
                       mock_open(read_data='{"foo": "bar"}')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "456",
                             "timestamp": str(int(datetime.now().timestamp())),
@@ -420,9 +414,9 @@ def test_execution_failed_get_blockchain(mocked_provider,
                       mock_open(read_data='{"foo": "bar"}')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "",
                             "timestamp": 0,
@@ -474,25 +468,24 @@ def test_trezor_claim_init(mocked_provider, mocked_checksum, mocked_contract, mo
     assert c.acc_name == "test_acc"
 
 
-@patch("axie_utils.claims.check_balance", return_value=10)
 @patch("axie_utils.graphql.parse_path", return_value="parsed_path")
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contract, mocked_parse, mocked_check):
+def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contract, mocked_parse):
     last_claimed_date = datetime.now() - timedelta(days=15)
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": round(last_claimed_date.timestamp()),
-                             "claimable_total": 0})
+                             "lastClaimedItemAt": round(last_claimed_date.timestamp()),
+                             "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='SLP_ABI')):
-            c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client", force=False)
+            c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client",
+                            force=False)
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 2
-        mocked_check.assert_called_with("0xfoo")
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER,
@@ -508,7 +501,7 @@ def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contr
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_has_unclaimed_slp_failed_req_trezor(mocked_provider, mocked_checksum, mocked_contract, mocked_parse):
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        status_code=500)
         with patch.object(builtins,
                           "open",
@@ -752,9 +745,9 @@ async def test_claim_async_execute_trezor(mocked_provider,
                       mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "456",
                             "timestamp": str(int(datetime.now().timestamp())),
@@ -824,9 +817,9 @@ async def test_async_execute_failed_get_blockchain_trezor(mocked_provider,
                       mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "",
                             "timestamp": 0,
@@ -895,9 +888,9 @@ def test_claim_execute_trezor(mocked_provider,
                       mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "456",
                             "timestamp": str(int(datetime.now().timestamp())),
@@ -966,9 +959,9 @@ def test_execute_failed_get_blockchain_trezor(mocked_provider,
                       mock_open(read_data='SLP_ABI')):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post(
-                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim",
                 json={
-                    "blockchain_related": {
+                    "blockchainRelated": {
                         "signature": {
                             "amount": "",
                             "timestamp": 0,
