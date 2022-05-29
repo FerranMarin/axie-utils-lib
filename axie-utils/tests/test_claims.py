@@ -62,6 +62,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
         req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
                              "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawTotal": 4,
                              "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
@@ -86,6 +87,7 @@ def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_cont
         req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
                              "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawTotal": 4,
                              "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
@@ -110,6 +112,7 @@ def test_has_unclaimed_date_force(mocked_provider, mocked_checksum, mocked_contr
         req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
                              "lastClaimedItemAt": last_claimed_date.timestamp(),
+                             "rawTotal": 4,
                              "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",
@@ -478,6 +481,7 @@ def test_has_unclaimed_slp_trezor(mocked_provider, mocked_checksum, mocked_contr
         req_mocker.get("http://game-api-pre.skymavis.com/v1/players/0xfoo/items/1",
                        json={"total": 12,
                              "lastClaimedItemAt": round(last_claimed_date.timestamp()),
+                             "rawTotal": 4,
                              "rawClaimableTotal": 2})
         with patch.object(builtins,
                           "open",

@@ -61,7 +61,7 @@ class Claim(AxieGraphQL):
                 return None
             elif self.force:
                 logging.info('Important: Skipping check of dates, --force option was selected')
-            claimable_total = int(data['rawClaimableTotal'])
+            claimable_total = int(data['rawTotal']) - int(data['rawClaimableTotal'])
             if claimable_total > 0:
                 return claimable_total
         return None
@@ -267,7 +267,7 @@ class TrezorClaim(TrezorAxieGraphQL):
                 return None
             elif self.force:
                 logging.info('Important: Skipping check of dates, --force option was selected')
-            claimable_total = int(data['rawClaimableTotal'])
+            claimable_total = int(data['rawTotal']) - int(data['rawClaimableTotal'])
             if claimable_total > 0:
                 return claimable_total
         return None
