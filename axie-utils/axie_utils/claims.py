@@ -85,7 +85,7 @@ class Claim(AxieGraphQL):
         }
         url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
-            response = self.request.post(url, headers=headers, json="")
+            response = self.request.post(url, headers=headers)
         except RetryError as e:
             logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
@@ -163,7 +163,7 @@ class Claim(AxieGraphQL):
         }
         url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
-            response = self.request.post(url, headers=headers, json="")
+            response = self.request.post(url, headers=headers)
         except RetryError as e:
             logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
@@ -291,7 +291,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         }
         url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
-            response = self.request.post(url, headers=headers, json="")
+            response = self.request.post(url, headers=headers)
         except RetryError as e:
             logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
@@ -383,7 +383,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         }
         url = "http://game-api-pre.skymavis.com/v1/players/me/items/1/claim"
         try:
-            response = self.request.post(url, headers=headers, json="")
+            response = self.request.post(url, headers=headers)
         except RetryError as e:
             logging.critical(f"Important: Error! Executing SLP claim API call for account {self.acc_name}"
                              f"({self.account.replace('0x', 'ronin:')}). Error {e}")
