@@ -117,7 +117,7 @@ class Claim(AxieGraphQL):
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
         # Get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
-       # Wait for transaction to finish or timeout
+        # Wait for transaction to finish or timeout
         start_time = datetime.now()
         while True:
             # We will wait for max 5 minutes for this tx to respond
@@ -224,6 +224,7 @@ class Claim(AxieGraphQL):
 
     def __str__(self):
         return f"SLP claim for account {self.account.replace('0x', 'ronin:')}"
+
 
 class TrezorClaim(TrezorAxieGraphQL):
     def __init__(self, acc_name, force, **kwargs):
