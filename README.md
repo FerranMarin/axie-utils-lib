@@ -16,13 +16,4 @@ For furhter documentation, please visit this [link](https://ferranmarin.github.i
 
 If you want to donate to thank me, feel free to do so at this ronin address:
 
-    ronin:9fa1bc784c665e683597d3f29375e45786617550
-
-If you prefer you can:
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G36LZ2A)
-    
-# Discord
-
-Feel free to join this <a href="https://discord.gg/bmKvmhenvu">Discord</a> that started with the axie scholar utilities CLI tool. I am very active there.
-Alternatively see other ways to contact me on my github profile.
+    ronin:9fa1bc784c665e683597d3f29375e45786617550 
